@@ -4,6 +4,7 @@
     "com.unity.netcode": "1.0.0-pre.44",
     "com.unity.physics": "1.0.0-pre.44",
     "com.unity.render-pipelines.core": "14.0.4",
+    "com.unity.render-pipelines.universal": "14.0.4",
     "com.unity.modules.ai": "1.0.0",
     "com.unity.modules.androidjni": "1.0.0",
     "com.unity.modules.animation": "1.0.0",
