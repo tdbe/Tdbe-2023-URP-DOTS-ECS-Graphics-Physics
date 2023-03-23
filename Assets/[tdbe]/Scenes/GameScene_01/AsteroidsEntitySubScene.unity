@@ -392,7 +392,9 @@ MonoBehaviour:
   asteroidPrefab: {fileID: 85503138005864851, guid: cf25a3e481c490240a21515cf1c3f8c7, type: 3}
   asteroidParent: {fileID: 1967340998}
   maxNumber: 1000
+  zRange: 1
   initialNumber: 10
+  initialImpulse: 1
 --- !u!114 &1690430216
 MonoBehaviour:
   m_ObjectHideFlags: 0
