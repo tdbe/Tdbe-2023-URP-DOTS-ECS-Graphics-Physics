@@ -57,14 +57,11 @@
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
-    "com.unity.logging": {
-      "version": "1.0.0-pre.21",
-      "depth": 1,
+    "com.unity.ide.vscode": {
+      "version": "1.2.5",
+      "depth": 0,
       "source": "registry",
-      "dependencies": {
-        "com.unity.burst": "1.8.2",
-        "com.unity.collections": "2.1.0-pre.11"
-      },
+      "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.mathematics": {
@@ -72,18 +69,6 @@
       "depth": 1,
       "source": "registry",
       "dependencies": {},
-      "url": "https://packages.unity.com"
-    },
-    "com.unity.netcode": {
-      "version": "1.0.0-pre.44",
-      "depth": 0,
-      "source": "registry",
-      "dependencies": {
-        "com.unity.transport": "2.0.0-pre.6",
-        "com.unity.entities": "1.0.0-pre.44",
-        "com.unity.logging": "1.0.0-pre.21",
-        "com.unity.modules.animation": "1.0.0"
-      },
       "url": "https://packages.unity.com"
     },
     "com.unity.nuget.mono-cecil": {
@@ -193,12 +178,12 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "2.0.0-pre.6",
-      "depth": 1,
+      "version": "2.0.0-pre.7",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.collections": "2.1.0-pre.6",
-        "com.unity.burst": "1.8.2",
+        "com.unity.burst": "1.8.3",
         "com.unity.mathematics": "1.2.6"
       },
       "url": "https://packages.unity.com"
