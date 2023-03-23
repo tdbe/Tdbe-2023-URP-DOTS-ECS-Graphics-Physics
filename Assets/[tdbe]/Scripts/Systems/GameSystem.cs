@@ -37,7 +37,7 @@ namespace World
                     m_cameraInitialized = true;
                     // move the bounds entities in this subscene
 
-                    // this is from unity's own 1.0 samples but seems dumb because it can't use command buffers (existing sync points):
+                    // this is from unity's own 1.0 samples but seems dumb for component changes because it can't use command buffers (existing sync points):
                     // foreach (var (lToW, tagc) in SystemAPI.Query<RefRO<LocalToWorld>, RefRO<BoundsTagComponent>>())
                     // not to mention local to world is no longer the way you change non-uniform scale
 

@@ -7,6 +7,8 @@ namespace World.Asteroid
         public Entity asteroidPrefab;
         public Entity asteroidParent;
         public uint maxNumber; 
+        public float zRange;
         public uint initialNumber;
+        public float initialImpulse;
     }
 }

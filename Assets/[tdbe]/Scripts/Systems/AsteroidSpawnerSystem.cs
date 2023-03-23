@@ -5,6 +5,9 @@ using Unity.Transforms;
 using Unity.Mathematics;
 using UnityEngine;
 
+using Unity.Physics;
+//using Unity.Physics.Extensions;
+
 namespace World.Asteroid
 {
     //[UpdateInGroup(typeof(InitializationSystemGroup))]
@@ -36,7 +39,8 @@ namespace World.Asteroid
 
         }
 
-        // should have just stored corners entities :)
+        // should have just stored a couple corners entities :)
+        // used for random min max
         [BurstCompile]
         private (float3, float3) GetCorners2(ref SystemState state, NativeArray<Entity> boundsEnts){
             float3 bl = float3.zero;
@@ -44,16 +48,16 @@ namespace World.Asteroid
             foreach(Entity bndEnt in boundsEnts){
                 uint id = SystemAPI.GetComponent<BoundsTagComponent>(bndEnt).boundsID;
                 if(id == 0)
-                    bl.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y;
+                    bl.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y+1.01f;
                 else
                 if(id == 1)
-                    bl.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x;
+                    bl.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x+1.01f;
                 else
                 if(id == 2)
-                    tr.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y;
+                    tr.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y-1.01f;
                 else
                 if(id == 3)
-                    tr.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x;
+                    tr.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x-1.01f;
             }
             return (bl, tr);
         }
@@ -62,16 +66,17 @@ namespace World.Asteroid
         public void OnUpdate(ref SystemState state)
         {
             Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
-            AsteroidSpawnerAspect asteroidSpawnAspect = SystemAPI.GetAspectRW<AsteroidSpawnerAspect>(stateCompEnt);
             AsteroidSpawnerStateComponent spawnerState = SystemAPI.GetComponent<AsteroidSpawnerStateComponent>(stateCompEnt);
          
             // Ways to handle game state: Tags, SharedComponents, Component values (this case), ComponentSystemGroup as "state".
             // This spawner system needs to run all the time (at a certain rate, unless game is paused), and otherwise it can be made `state.Enabled = false;`.
             if(spawnerState.state == AsteroidSpawnerStateComponent.State.InitialSpawn)
             {
-                EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
                 Debug.Log("[AsteroidSpawner][InitialSpawn] spawning. ");
-                
+                AsteroidSpawnerAspect asteroidSpawnAspect = SystemAPI.GetAspectRW<AsteroidSpawnerAspect>(stateCompEnt);
+                //var endFixedECB = SystemAPI.GetSingletonRW<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
+                var ecb = new EntityCommandBuffer(Allocator.Temp);
+
                 var corners2 = GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp));
 
                 int existingAsteroidCount = m_asteroidsGroup.CalculateEntityCount();
@@ -81,8 +86,9 @@ namespace World.Asteroid
                         break;
                     }
                     Entity asteroid = ecb.Instantiate(asteroidSpawnAspect.asteroidPrefab);
-                    LocalTransform newAsteroidLTransform = asteroidSpawnAspect.GetAsteroidTransform(corners2);
-                    ecb.SetComponent<LocalTransform>(asteroid, newAsteroidLTransform);
+                    ecb.SetComponent<LocalTransform>(asteroid, asteroidSpawnAspect.GetAsteroidTransform(corners2));
+
+                    ecb.SetComponent<PhysicsVelocity>(asteroid, asteroidSpawnAspect.GetPhysicsVelocity());
 
                     //TODO: still wanted like this? change to authoring?
                     ecb.AddSharedComponent<AsteroidStateSharedComponent>(asteroid, new AsteroidStateSharedComponent{ 
@@ -93,6 +99,7 @@ namespace World.Asteroid
                             Value = asteroidSpawnAspect.asteroidParent
                     });
 
+                    
                 }
 
                 //ecb.DestroyEntity(asteroidSpawnAspect.asteroidPrefab)
