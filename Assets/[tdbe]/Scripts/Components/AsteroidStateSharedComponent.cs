@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace World.Asteroid
+namespace GameWorld.Asteroid
 {
     public struct AsteroidStateSharedComponent : ISharedComponentData
     {

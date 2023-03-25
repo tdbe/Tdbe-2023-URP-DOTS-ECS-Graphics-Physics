@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace World
+namespace GameWorld
 {
     // this is a "tag component" hybrid; both a tag, and data for id within this tag.
     public struct BoundsTagComponent : IComponentData

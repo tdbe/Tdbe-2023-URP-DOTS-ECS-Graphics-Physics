@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace World.Asteroid
+namespace GameWorld.Asteroid
 {
     public struct AsteroidSpawnerComponent : IComponentData
     {
@@ -8,7 +8,9 @@ namespace World.Asteroid
         public Entity asteroidParent;
         public uint maxNumber; 
         public float zRange;
+        public float decorativeRandomScaleBump;
         public uint initialNumber;
         public float initialImpulse;
+        public uint inGameSpawnRate_ms;// TODO: if I decide to change this gradually, move to own separate component
     }
 }

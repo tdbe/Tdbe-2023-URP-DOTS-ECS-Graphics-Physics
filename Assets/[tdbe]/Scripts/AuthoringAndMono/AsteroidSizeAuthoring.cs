@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Entities;
 
-namespace World.Asteroid
+namespace GameWorld.Asteroid
 {
     public class AsteroidSizeAuthoring : MonoBehaviour
     {

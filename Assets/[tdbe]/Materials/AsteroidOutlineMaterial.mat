@@ -102,7 +102,7 @@ Material:
     - _GlossyReflections: 0
     - _Metallic: 0
     - _OcclusionStrength: 1
-    - _OutlineThickness: 0.03
+    - _OutlineThickness: 0.035
     - _Parallax: 0.005
     - _QueueControl: 1
     - _QueueOffset: 0

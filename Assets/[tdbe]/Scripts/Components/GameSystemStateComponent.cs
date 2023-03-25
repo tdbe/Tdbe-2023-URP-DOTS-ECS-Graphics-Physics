@@ -1,6 +1,6 @@
 using Unity.Entities;
 
-namespace World
+namespace GameWorld
 {
     public struct GameSystemStateComponent : IComponentData
     {

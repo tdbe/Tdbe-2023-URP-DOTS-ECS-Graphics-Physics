@@ -393,8 +393,10 @@ MonoBehaviour:
   asteroidParent: {fileID: 1967340998}
   maxNumber: 1000
   zRange: 1
+  decorativeRandomScaleBump: 0.05
   initialNumber: 10
-  initialImpulse: 1
+  initialImpulse: 1.25
+  inGameSpawnRate_ms: 2500
 --- !u!114 &1690430216
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Entities;
 using Unity.Mathematics;
 
-namespace World.Asteroid
+namespace GameWorld.Asteroid
 {
     public class GameSystemStateAuthoring : MonoBehaviour
     {

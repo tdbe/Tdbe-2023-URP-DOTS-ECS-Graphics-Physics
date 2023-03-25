@@ -3,17 +3,18 @@ using Unity.Entities;
 using Unity.Collections;
 using UnityEngine;
 
-namespace World
+namespace GameWorld
 {
     [BurstCompile]
     public partial struct PrefabSpawnerSystem : ISystem
     {
+        private EntityQuery spawnerEQG;
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PrefabSpawnerComponent>();
-            
+            spawnerEQG = state.GetEntityQuery(ComponentType.ReadOnly<PrefabSpawnerComponent>());
             
         }
 
@@ -27,10 +28,26 @@ namespace World
         public void OnUpdate(ref SystemState state)
         {
             PrefabSpawnerComponent spawnerComp = SystemAPI.GetSingleton<PrefabSpawnerComponent>();
-
-            EntityCommandBuffer ecb = new EntityCommandBuffer(Allocator.Temp);
+            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             Debug.Log("[PrefabSpawner][InitialSpawn] spawning. ");
 
+            new SpawnerJob
+            {
+                ecb = ecb
+            }.Schedule(spawnerEQG);
+        
+            state.Enabled = false;
+        }
+    }
+
+    [BurstCompile]
+    public partial struct SpawnerJob:IJobEntity
+    {
+        public EntityCommandBuffer ecb;
+        private void Execute(in PrefabSpawnerComponent spawnerComp)
+        {
+            //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
             for(uint i = 0; i < spawnerComp.spawnNumber; i++){
                 
                 Entity prefabInstance = ecb.Instantiate(spawnerComp.prefab);
@@ -44,11 +61,8 @@ namespace World
                 });
 
             }
-            ecb.DestroyEntity(spawnerComp.prefab);
-            ecb.Playback(state.EntityManager);
-        
-        
-            state.Enabled = false;
+            ecb.DestroyEntity(spawnerComp.prefab);     
+            //spawnerCompArr.Dispose();
         }
     }
 }
