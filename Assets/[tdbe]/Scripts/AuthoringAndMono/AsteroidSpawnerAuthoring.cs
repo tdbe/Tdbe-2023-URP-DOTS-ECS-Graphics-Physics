@@ -7,7 +7,7 @@ namespace GameWorld.Asteroid
     // but conceptually spealking these are 3 categories of things that normally shouldn't have common links.
     public class AsteroidSpawnerAuthoring : MonoBehaviour
     {
-        [Header("Have a hard upper limit of asteroid number \nfor some sort of memory cap assurance.")]
+        [Header("Have a hard upper limit of asteroid number \nfor some sort of cap assurance.")]
         public uint maxNumber = 1000; 
         [Header("Playing with the depth of the asteroid field.")]
         public float zRange = 2;

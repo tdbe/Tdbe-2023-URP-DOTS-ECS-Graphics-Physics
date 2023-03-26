@@ -201,20 +201,24 @@ namespace GameWorld.NPCs
         }
     }
 
-    // this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
+    // if you really wanted, this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
     //[BurstCompile]
     public partial struct NPCSpawnerJob:IJobEntity
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
         private int thri;
         public EntityCommandBuffer ecb;
+        [ReadOnly]
         public uint spawnAmount;
+        [ReadOnly]
         public int existingCount;
+        [ReadOnly]
         public (float3, float3) targetArea;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public NativeArray<Unity.Mathematics.Random> rga;
+        [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
-
+        //[BurstCompile]
         private void Execute(UFOSpawnerAspect UFOSpawnAspect)
         {
             Unity.Mathematics.Random rg = rga[thri];

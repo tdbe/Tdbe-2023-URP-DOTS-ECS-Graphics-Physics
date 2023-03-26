@@ -183,10 +183,10 @@ namespace GameWorld.Pickups
                     var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                     int existingCount = m_PickupsGroupShield.CalculateEntityCount() + m_PickupsGroupGun.CalculateEntityCount();
                     PickupsSpawnerComponent pickupsComp = SystemAPI.GetSingleton<PickupsSpawnerComponent>();
-
+                    
                     if(existingCount < pickupsComp.maxNumber){
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
-                        
+
                         {
                         var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt).randomGeneratorArr;
                         Unity.Mathematics.Random rg = rga[0];
@@ -205,34 +205,41 @@ namespace GameWorld.Pickups
         }
     }
 
-    // this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
+    // if you really wanted, this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
     //[BurstCompile]
     public partial struct PickupsSpawnerJob:IJobEntity
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
         private int thri;
         public EntityCommandBuffer ecb;
+        [ReadOnly]
         public uint spawnAmount;
+        [ReadOnly]
         public int existingCount;
-        public (float3, float3) targetArea;
+        [ReadOnly]
+        public (float3, float3) targetArea; 
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public NativeArray<Unity.Mathematics.Random> rga;
+        [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
-
+        //[BurstCompile]
         private void Execute(PickupsSpawnerAspect pickupsSpawnAspect)
         {
             Unity.Mathematics.Random rg = rga[thri];
             for(uint i = 0; i < spawnAmount; i++){
+                
                 if(i + existingCount >= pickupsSpawnAspect.maxNumber){
                     break;
                 }
                 int which = rg.NextInt(0, prefabsAndParents.Length);
 
-                Entity pickups = ecb.Instantiate(prefabsAndParents[which].prefab);
+                Entity pickup = ecb.Instantiate(prefabsAndParents[which].prefab);
 
-                ecb.SetComponent<LocalTransform>(pickups, pickupsSpawnAspect.GetPickupsTransform(ref rg, targetArea));
+                ecb.SetComponent<LocalTransform>(pickup, pickupsSpawnAspect.GetPickupsTransform(ref rg, targetArea));
 
-                ecb.AddComponent<Unity.Transforms.Parent>(pickups, new Unity.Transforms.Parent{ 
+                ecb.SetComponent<PhysicsVelocity>(pickup, pickupsSpawnAspect.GetPhysicsVelocity());
+
+                ecb.AddComponent<Unity.Transforms.Parent>(pickup, new Unity.Transforms.Parent{ 
                         Value = prefabsAndParents[which].parent
                 });
             }

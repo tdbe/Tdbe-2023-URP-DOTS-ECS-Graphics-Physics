@@ -134,6 +134,7 @@ namespace GameWorld
     public partial struct BoundsJob:IJobEntity
     {
         public EntityCommandBuffer ecb;
+        //[BurstCompile]
         private void Execute(in Entity bndEnt, in LocalTransform lt, in BoundsTagComponent tagC)
         {
             float3 pos = HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item1;

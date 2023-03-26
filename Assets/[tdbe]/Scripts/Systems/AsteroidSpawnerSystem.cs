@@ -252,26 +252,32 @@ namespace GameWorld.Asteroid
         }
     }
 
-    // this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
+    // if you really wanted, this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
     //[BurstCompile]
     public partial struct AsteroidSpawnerJob:IJobEntity
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
         private int thri;
         public EntityCommandBuffer ecb;
+        [ReadOnly]
         public uint spawnAmount;
+        [ReadOnly]
         public int existingCount;
+        [ReadOnly]
         public (float3, float3) targetArea;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public NativeArray<Unity.Mathematics.Random> rga;
+        [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
 
+        // TODO: can you do parallel spawning, like this?: ecb.parallelwriter, a pre-spawned query of entities to send to this parallel thread, and here add components to each in parallel
+        //[BurstCompile]
         private void Execute(AsteroidSpawnerAspect asteroidSpawnAspect)
         {
             Unity.Mathematics.Random rg = rga[thri];
             for(uint i = 0; i < spawnAmount; i++){
                 if(i + existingCount >= asteroidSpawnAspect.maxNumber){
-                    Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
+                    //Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
                     break;
                 }
                 

@@ -48,5 +48,18 @@ namespace GameWorld.Pickups
                 Scale = CalcRandScale(ref rnd)
             };
         }
+
+        // hacking it here and this way, to get a quick animation for the pickups
+        public PhysicsVelocity GetPhysicsVelocity(){
+            float speedMult = 1;
+            float3 dir = new float3(0, 0, 1) * speedMult;
+            return new PhysicsVelocity{
+                        Linear = float3.zero,
+                        Angular = dir
+                    };
+            // Aaand of course Rigidbody's freeze functionality is NOT authored into ECS.
+            // So I imported the [external] Unity_JAC_shit folder for Joint Authoring Components...
+        }
+
     }
 }

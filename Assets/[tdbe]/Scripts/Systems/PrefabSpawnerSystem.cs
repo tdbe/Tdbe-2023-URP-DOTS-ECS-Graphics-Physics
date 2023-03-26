@@ -50,6 +50,7 @@ namespace GameWorld
     {
         public EntityCommandBuffer ecb;
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
+        [BurstCompile]
         private void Execute(in PrefabSpawnerComponent spawnerComp)
         {
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
