@@ -15,6 +15,7 @@ namespace GameWorld.Asteroid
     {
         public AsteroidSpawnerVRUpdateGroup()
         {
+            // NOTE: Unity.Entities.RateUtils.VariableRateManager.MinUpdateRateMS
             RateManager = new RateUtils.VariableRateManager(16, true);
         }
 
@@ -23,6 +24,8 @@ namespace GameWorld.Asteroid
         }
     }
 
+    // TODO: should try organizing in some writegroups and jobs and/or some externals here e.g. across ufo, asteroid, powerup spawning.
+    // But also, conceptually spealking, in general gamedev, these are 3 categories of things that normally shouldn't have common links.
     [UpdateInGroup(typeof(AsteroidSpawnerVRUpdateGroup))]
     [BurstCompile]
     public partial struct AsteroidSpawnerSystem : ISystem
@@ -75,7 +78,8 @@ namespace GameWorld.Asteroid
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<AsteroidSpawnerComponent>();
-            state.RequireForUpdate<AsteroidSpawnerRandomnessComponent>();
+            state.RequireForUpdate<PrefabAndParentBufferComponent>();
+            state.RequireForUpdate<RandomnessComponent>();
             state.RequireForUpdate<AsteroidSpawnerStateComponent>();
             //state.RequireForUpdate<AsteroidSpawnerAspect>();
 
@@ -117,12 +121,12 @@ namespace GameWorld.Asteroid
         }
 
         private void DoSpawnOnMap(  ref SystemState state, ref EntityCommandBuffer ecb, ref Entity stateCompEnt, 
-                                    AsteroidSpawnerStateComponent.State spawnerState)
+                                    AsteroidSpawnerStateComponent.State spawnerState, int existingCount)
         {
             AsteroidSpawnerAspect asteroidSpawnAspect = SystemAPI.GetAspectRW<AsteroidSpawnerAspect>(stateCompEnt);
             uint spawnAmount = 0;
             var targetArea = (float3.zero, float3.zero);
-            int existingAsteroidCount = m_asteroidsGroup.CalculateEntityCount();
+            
             if(spawnerState == AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff)
             {
                 spawnAmount = asteroidSpawnAspect.initialNumber;
@@ -153,15 +157,20 @@ namespace GameWorld.Asteroid
                 }   
                 */
             }
+            else if(spawnerState == AsteroidSpawnerStateComponent.State.Inactive){
+                return;
+            }
 
-            var rga = SystemAPI.GetComponent<AsteroidSpawnerRandomnessComponent>(stateCompEnt).randomGeneratorArr;
+            var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt).randomGeneratorArr;
+            var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
             new AsteroidSpawnerJob
             {
                 ecb = ecb,
                 spawnAmount = spawnAmount,
                 targetArea = targetArea,
-                existingAsteroidCount = existingAsteroidCount,
-                rga = rga
+                existingCount = existingCount,
+                rga = rga,
+                prefabsAndParents = prefabsAndParents
             }.Schedule();
 
            
@@ -173,8 +182,7 @@ namespace GameWorld.Asteroid
             uint rate = 16;
             if(!fast)
             {
-                Debug.Log("2500");
-                rate = 2500;// SystemAPI.GetSingleton<AsteroidSpawnerComponent>().inGameSpawnRate_ms;
+                rate = SystemAPI.GetSingleton<AsteroidSpawnerComponent>().inGameSpawnRate_ms;
             }
             /*
             // me figuring this out...
@@ -210,7 +218,9 @@ namespace GameWorld.Asteroid
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state);
+                
+                int existingCount = m_asteroidsGroup.CalculateEntityCount();
+                DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
                 
                 ecb = new EntityCommandBuffer(Allocator.Temp);
                 SetNewRateState(ref state, ref ecb, AsteroidSpawnerStateComponent.State.InGameSpawn);
@@ -218,15 +228,12 @@ namespace GameWorld.Asteroid
             }
             else if(spawnerState.state == AsteroidSpawnerStateComponent.State.InGameSpawn)
             {
-                //Debug.Log("[AsteroidSpawner][InGameSpawn] tick spawn. ");
-             
-                //TODO: I would actually like this mode to spawn new asteroids from the edges only
-
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 
-                DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state);
+                int existingCount = m_asteroidsGroup.CalculateEntityCount();
+                DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
                 
             }
             else if(spawnerState.state == AsteroidSpawnerStateComponent.State.TargetedSpawn_oneoff)
@@ -234,7 +241,9 @@ namespace GameWorld.Asteroid
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state);
+
+                int existingCount = m_asteroidsGroup.CalculateEntityCount();
+                DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
 
                 ecb = new EntityCommandBuffer(Allocator.Temp);
                 SetNewRateState(ref state, ref ecb, prevState);
@@ -243,6 +252,7 @@ namespace GameWorld.Asteroid
         }
     }
 
+    // this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
     //[BurstCompile]
     public partial struct AsteroidSpawnerJob:IJobEntity
     {
@@ -250,21 +260,22 @@ namespace GameWorld.Asteroid
         private int thri;
         public EntityCommandBuffer ecb;
         public uint spawnAmount;
-        public int existingAsteroidCount;
+        public int existingCount;
         public (float3, float3) targetArea;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public NativeArray<Unity.Mathematics.Random> rga;
+        public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
 
         private void Execute(AsteroidSpawnerAspect asteroidSpawnAspect)
         {
             Unity.Mathematics.Random rg = rga[thri];
             for(uint i = 0; i < spawnAmount; i++){
-                if(i + 1 + existingAsteroidCount >= asteroidSpawnAspect.maxNumber){
+                if(i + existingCount >= asteroidSpawnAspect.maxNumber){
                     Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
                     break;
                 }
                 
-                Entity asteroid = ecb.Instantiate(asteroidSpawnAspect.asteroidPrefab);
+                Entity asteroid = ecb.Instantiate(prefabsAndParents[0].prefab);
 
                 ecb.SetComponent<LocalTransform>(asteroid, asteroidSpawnAspect.GetAsteroidTransform(ref rg, targetArea));
 
@@ -276,13 +287,10 @@ namespace GameWorld.Asteroid
                 });
 
                 ecb.AddComponent<Unity.Transforms.Parent>(asteroid, new Unity.Transforms.Parent{ 
-                        Value = asteroidSpawnAspect.asteroidParent
+                        Value = prefabsAndParents[0].parent
                 });
             }
             rga[thri] = rg;
-            
-            
-            //.Dispose();
         }
     }
 

@@ -6,6 +6,8 @@ using Unity.Mathematics;
 using UnityEngine;
 
 using GameWorld.Asteroid;
+using GameWorld.NPCs;
+using GameWorld.Pickups;
 
 namespace GameWorld
 {
@@ -20,6 +22,7 @@ namespace GameWorld
         {
             state.RequireForUpdate<GameSystemStateComponent>();
             state.RequireForUpdate<AsteroidSpawnerStateComponent>();
+            state.RequireForUpdate<NPCSpawnerStateComponent>();
             state.RequireForUpdate<BoundsTagComponent>();
 
             m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
@@ -73,6 +76,14 @@ namespace GameWorld
                 var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
                 asteroidSpawner.SetNewRateState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff);
 
+                sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
+                var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
+                npcSpawner.SetNewRateState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
+
+                sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
+                var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
+                pickupsSpawner.SetNewRateState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
+
                 // transition to running
                 ecb.SetComponent<GameSystemStateComponent>(
                     stateCompEnt,
@@ -83,10 +94,9 @@ namespace GameWorld
             }
             else if(gameState.state == GameSystemStateComponent.State.Running)
             {
-                var ecb = new EntityCommandBuffer(Allocator.Temp);
+                var ecb = new EntityCommandBuffer(Allocator.TempJob);
                 SetBounds(ref state, ref ecb, false);
-
-
+            
                 ecb.Playback(state.EntityManager);
             }
             else if(gameState.state == GameSystemStateComponent.State.Ending)

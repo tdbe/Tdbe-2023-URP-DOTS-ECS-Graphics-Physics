@@ -13,9 +13,6 @@ namespace GameWorld.Asteroid
         //private readonly TransformAspect m_transformAspect;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         private readonly RefRO<AsteroidSpawnerComponent> m_asteroidSpawnerComponent;
-
-        public Entity asteroidParent => m_asteroidSpawnerComponent.ValueRO.asteroidParent;
-        public Entity asteroidPrefab => m_asteroidSpawnerComponent.ValueRO.asteroidPrefab;
         public uint maxNumber => m_asteroidSpawnerComponent.ValueRO.maxNumber;
         public uint initialNumber => m_asteroidSpawnerComponent.ValueRO.initialNumber;
 

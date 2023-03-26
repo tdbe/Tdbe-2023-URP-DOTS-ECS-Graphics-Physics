@@ -14,6 +14,7 @@ namespace GameWorld
         public void OnCreate(ref SystemState state)
         {
             state.RequireForUpdate<PrefabSpawnerComponent>();
+            state.RequireForUpdate<PrefabAndParentBufferComponent>();
             spawnerEQG = state.GetEntityQuery(ComponentType.ReadOnly<PrefabSpawnerComponent>());
             
         }
@@ -32,9 +33,12 @@ namespace GameWorld
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             Debug.Log("[PrefabSpawner][InitialSpawn] spawning. ");
 
+            Entity stateCompEnt = SystemAPI.GetSingletonEntity<PrefabSpawnerComponent>();
+            var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
             new SpawnerJob
             {
-                ecb = ecb
+                ecb = ecb,
+                prefabsAndParents = prefabsAndParents
             }.Schedule(spawnerEQG);
         
             state.Enabled = false;
@@ -45,23 +49,22 @@ namespace GameWorld
     public partial struct SpawnerJob:IJobEntity
     {
         public EntityCommandBuffer ecb;
+        public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
         private void Execute(in PrefabSpawnerComponent spawnerComp)
         {
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
             for(uint i = 0; i < spawnerComp.spawnNumber; i++){
-                
-                Entity prefabInstance = ecb.Instantiate(spawnerComp.prefab);
+                Entity prefabInstance = ecb.Instantiate(prefabsAndParents[0].prefab);
                 
                 ecb.AddComponent<Unity.Transforms.Parent>(prefabInstance, new Unity.Transforms.Parent{ 
-                    Value = spawnerComp.prefabParent
+                    Value = prefabsAndParents[0].parent
                 });
 
                 ecb.SetComponent<BoundsTagComponent>(prefabInstance, new BoundsTagComponent{
                     boundsID = i
                 });
-
             }
-            ecb.DestroyEntity(spawnerComp.prefab);     
+            ecb.DestroyEntity(prefabsAndParents[0].prefab);     
             //spawnerCompArr.Dispose();
         }
     }
