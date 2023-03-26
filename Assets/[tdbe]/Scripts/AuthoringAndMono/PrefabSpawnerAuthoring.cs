@@ -7,8 +7,6 @@ namespace GameWorld.Asteroid
     {
         // these could be made into an array or something, to spawn multiple types of prefabs
         // keep this pretty generic
-        public GameObject prefab;
-        public GameObject prefabParent;
         public uint spawnNumber = 4;
 
 
@@ -17,8 +15,6 @@ namespace GameWorld.Asteroid
             public override void Bake(PrefabSpawnerAuthoring authoring)
             {
                 AddComponent<PrefabSpawnerComponent>(new PrefabSpawnerComponent{
-                    prefab = GetEntity(authoring.prefab),
-                    prefabParent = GetEntity(authoring.prefabParent),
                     spawnNumber = authoring.spawnNumber
                 });
             }

@@ -7,7 +7,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: CantDoMultiPassesInShaderGraph
+  m_Name: Player_CantDoMultiPassesInShaderGraphHack
   m_Shader: {fileID: -6465566751694194690, guid: 1460c6a84cfd85c45aa453a1a80a9d86, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -83,7 +83,7 @@ Material:
     m_Floats:
     - _AlphaClip: 0
     - _AlphaToMask: 0
-    - _Amplitude: -0.15
+    - _Amplitude: 0
     - _Blend: 0
     - _BlendModePreserveSpecular: 1
     - _BumpScale: 1
@@ -112,7 +112,7 @@ Material:
     - _SrcBlendAlpha: 1
     - _Surface: 0
     - _Thickness: 1
-    - _ViewDirAdd: 0.26
+    - _ViewDirAdd: 0.06
     - _ViewDirMultiply: 0
     - _WorkflowMode: 1
     - _ZWrite: 1

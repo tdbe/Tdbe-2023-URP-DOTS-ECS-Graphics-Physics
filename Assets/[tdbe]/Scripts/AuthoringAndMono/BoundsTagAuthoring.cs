@@ -2,7 +2,7 @@ using UnityEngine;
 using Unity.Entities;
 using Unity.Transforms;
 
-namespace GameWorld.Asteroid
+namespace GameWorld
 {
     // this is a "tag component" hybrid; both a tag, and data for id within this tag.
     public class BoundsTagAuthoring : MonoBehaviour
