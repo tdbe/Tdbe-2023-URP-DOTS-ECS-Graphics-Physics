@@ -41,6 +41,7 @@ namespace GameWorld.NPCs
         public EntityCommandBuffer ecb;
         private void Execute(in Entity bndEnt, in LocalTransform lt, in BoundsTagComponent tagC)
         {
+            /*
             float3 pos = HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item1;
             pos.z = lt.Position.z;
             
@@ -66,7 +67,7 @@ namespace GameWorld.NPCs
             ecb.AddComponent<PostTransformScale>(
                 bndEnt,
                 new_pts
-                );
+                );*/
             
         }
     }

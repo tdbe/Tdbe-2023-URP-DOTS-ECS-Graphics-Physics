@@ -13,6 +13,7 @@ namespace GameWorld
     //[UpdateAfter(typeof(Unity.Physics.Systems.PhysicsSimulationGroup))]
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateAfter(typeof(PhysicsSystemGroup))]
+    [BurstCompile]
     public partial struct PositionalWarpingSystem : ISystem
     {
         ComponentLookup<BoundsTagComponent> m_boundsTCL;
@@ -25,11 +26,13 @@ namespace GameWorld
             m_ltransTCL = state.GetComponentLookup<LocalTransform>(false);
         }
 
+        [BurstCompile]
         public void OnDestroy(ref SystemState state)
         {
 
         }
 
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             // EndSimulationEntityCommandBufferSystem
