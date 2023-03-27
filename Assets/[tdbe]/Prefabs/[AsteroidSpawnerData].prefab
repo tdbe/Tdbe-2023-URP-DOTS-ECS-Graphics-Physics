@@ -52,7 +52,7 @@ MonoBehaviour:
   decorativeRandomScaleBump: 0.05
   initialNumber: 10
   initialImpulse: 1.25
-  inGameSpawnRate_ms: 2500
+  inGameSpawnRate_ms: 3000
 --- !u!114 &4121871349082483633
 MonoBehaviour:
   m_ObjectHideFlags: 0

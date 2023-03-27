@@ -1439,6 +1439,7 @@ GameObject:
   - component: {fileID: 4178619947887153333}
   - component: {fileID: 654603664549717999}
   - component: {fileID: 8805914970066724491}
+  - component: {fileID: 3938630759052820929}
   m_Layer: 23
   m_Name: Gun_pickup
   m_TagString: Untagged
@@ -1460,7 +1461,7 @@ Transform:
   m_Children:
   - {fileID: 53157451617919332}
   m_Father: {fileID: 0}
-  m_RootOrder: 2
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &737154632322764960
 Rigidbody:
@@ -1503,7 +1504,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_MotionType: 0
   m_Smoothing: 0
-  m_Mass: 1
+  m_Mass: 100
   m_LinearDamping: 100
   m_AngularDamping: 0
   m_InitialLinearVelocity:
@@ -1578,6 +1579,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f329a2bb9c2ba404badb7f9e0db5ea13, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerGunPrefab: {fileID: 4107237136837000114, guid: 505284f62c6026f418f53422f2c8b1a2, type: 3}
+--- !u!114 &3938630759052820929
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4377867094261573720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d454c3e11f4be9479e91a14437f07bd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  warpImmunityPeriod: 0.5
 --- !u!1 &4468848779926832170
 GameObject:
   m_ObjectHideFlags: 0
@@ -2696,6 +2711,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1235755336090976952}
   - component: {fileID: 7579183600303405570}
+  - component: {fileID: 2511435147105228965}
   m_Layer: 23
   m_Name: part
   m_TagString: Untagged
@@ -2739,6 +2755,149 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 1.05
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2511435147105228965
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8344520945761007720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b275e5f92732148048d7b77e264ac30e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShapeType: 2
+  m_PrimitiveCenter:
+    x: 0
+    y: 0
+    z: 0
+  m_PrimitiveSize:
+    x: 2.1
+    y: 2.1
+    z: 2.1
+  m_PrimitiveOrientation:
+    Value:
+      x: 0
+      y: 0
+      z: 0
+    RotationOrder: 4
+  m_Capsule:
+    Height: 2.1
+    Radius: 1.05
+    Axis: 2
+  m_Cylinder:
+    Height: 2.1
+    Radius: 1.05
+    Axis: 2
+  m_CylinderSideCount: 20
+  m_SphereRadius: 1.05
+  m_MinimumSkinnedVertexWeight: 0.1
+  m_ConvexHullGenerationParameters:
+    m_SimplificationTolerance: 0.015
+    m_BevelRadius: 0.05
+    m_MinimumAngle: 2.5000002
+  m_CustomMesh: {fileID: 0}
+  m_ForceUnique: 0
+  m_Material:
+    m_SupportsTemplate: 1
+    m_Template: {fileID: 0}
+    m_CollisionResponse:
+      m_Override: 0
+      m_Value: 3
+    m_Friction:
+      m_Override: 0
+      m_Value:
+        Value: 0.5
+        CombineMode: 0
+    m_Restitution:
+      m_Override: 0
+      m_Value:
+        Value: 0
+        CombineMode: 2
+    m_BelongsToCategories:
+      m_Override: 0
+      m_Value:
+        Category00: 1
+        Category01: 1
+        Category02: 1
+        Category03: 1
+        Category04: 1
+        Category05: 1
+        Category06: 1
+        Category07: 1
+        Category08: 1
+        Category09: 1
+        Category10: 1
+        Category11: 1
+        Category12: 1
+        Category13: 1
+        Category14: 1
+        Category15: 1
+        Category16: 1
+        Category17: 1
+        Category18: 1
+        Category19: 1
+        Category20: 1
+        Category21: 1
+        Category22: 1
+        Category23: 1
+        Category24: 1
+        Category25: 1
+        Category26: 1
+        Category27: 1
+        Category28: 1
+        Category29: 1
+        Category30: 1
+        Category31: 1
+    m_CollidesWithCategories:
+      m_Override: 0
+      m_Value:
+        Category00: 1
+        Category01: 1
+        Category02: 1
+        Category03: 1
+        Category04: 1
+        Category05: 1
+        Category06: 1
+        Category07: 1
+        Category08: 1
+        Category09: 1
+        Category10: 1
+        Category11: 1
+        Category12: 1
+        Category13: 1
+        Category14: 1
+        Category15: 1
+        Category16: 1
+        Category17: 1
+        Category18: 1
+        Category19: 1
+        Category20: 1
+        Category21: 1
+        Category22: 1
+        Category23: 1
+        Category24: 1
+        Category25: 1
+        Category26: 1
+        Category27: 1
+        Category28: 1
+        Category29: 1
+        Category30: 1
+        Category31: 1
+    m_CustomMaterialTags:
+      m_Override: 0
+      m_Value:
+        Tag00: 0
+        Tag01: 0
+        Tag02: 0
+        Tag03: 0
+        Tag04: 0
+        Tag05: 0
+        Tag06: 0
+        Tag07: 0
+    m_SerializedVersion: 1
+  m_SerializedVersion: 1
 --- !u!1 &8363640253274624624
 GameObject:
   m_ObjectHideFlags: 0
