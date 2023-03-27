@@ -586,10 +586,6 @@ PrefabInstance:
       propertyPath: parents.Array.data[1]
       value: 
       objectReference: {fileID: 1429405083}
-    - target: {fileID: 4792037656843308454, guid: 5a31cb8e73c11044ebd4bf85eb71bbec, type: 3}
-      propertyPath: maxNumber
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 4792037656843308476, guid: 5a31cb8e73c11044ebd4bf85eb71bbec, type: 3}
       propertyPath: m_RootOrder
       value: -1

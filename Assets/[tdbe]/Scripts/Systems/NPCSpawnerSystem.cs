@@ -10,9 +10,9 @@ using Unity.Physics;
 
 namespace GameWorld.NPCs
 {
-    public class NpcSpawnerVRUpdateGroup:ComponentSystemGroup
+    public class NPCSpawnerVRUpdateGroup:ComponentSystemGroup
     {
-        public NpcSpawnerVRUpdateGroup()
+        public NPCSpawnerVRUpdateGroup()
         {
             // NOTE: Unity.Entities.RateUtils.VariableRateManager.MinUpdateRateMS
             RateManager = new RateUtils.VariableRateManager(16, true);
@@ -25,52 +25,42 @@ namespace GameWorld.NPCs
 
     // TODO: should try organizing in some writegroups and jobs and/or some externals here e.g. across ufo, asteroid, powerup spawning.
     // But also, conceptually spealking, in general gamedev, these are 3 categories of things that normally shouldn't have common links.
-    [UpdateInGroup(typeof(NpcSpawnerVRUpdateGroup))]
+    [UpdateInGroup(typeof(NPCSpawnerVRUpdateGroup))]
     [BurstCompile]
     public partial struct NPCSpawnerSystem : ISystem
     {
         private EntityQuery m_UFOsGroup;
         private EntityQuery m_boundsGroup;
-        private NPCSpawnerStateComponent.State prevState;
         // TODO: this is me screwing around. There has to be a better way, but there are no docs yet.
-        private bool justUpdatedRate;
+        private double lastUpdateRateTime;
 
-        // Set from other systems, because variable rate. (would like to debate how good and bad of an idea this is)
-        public void SetNewRateState(ref SystemState state, NPCSpawnerStateComponent.State newState)
+        // Need to set variable rate from other systems
+        public void SetNewRate(ref SystemState state)
         {
+            // var ecb = new EntityCommandBuffer(Allocator.Temp);
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            SetNewRateState(ref state, ref ecb, newState);
+            Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
+            uint rate = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt).currentSpawnRate_ms;
+
+            var asvrUpdateGroup = state.World.GetExistingSystemManaged<NPCSpawnerVRUpdateGroup>();
+            asvrUpdateGroup.SetRateManager(rate, true);
+            lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
         }
 
-        private void SetNewRateState(ref SystemState state, ref EntityCommandBuffer ecb, NPCSpawnerStateComponent.State newState)
+        public void SetNewState(ref SystemState state, NPCSpawnerStateComponent.State newState)
         {
-            // handle transition to next state, and also prepare the variable rate update rate
+            // var ecb = new EntityCommandBuffer(Allocator.Temp);
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
-
-            if(newState == NPCSpawnerStateComponent.State.InGameSpawn)
-            {
-                
-                prevState = SystemAPI.GetSingleton<NPCSpawnerStateComponent>().state;
-                ecb.SetComponent<NPCSpawnerStateComponent>(
-                    stateCompEnt,
-                    new NPCSpawnerStateComponent{
-                        state = newState
-                    });
-                SetNewVariableRate(ref state, SystemAPI.GetSingleton<UFOSpawnComponent>().inGameSpawnRate_ms);
-            }
-            else{
-
-                prevState = SystemAPI.GetSingleton<NPCSpawnerStateComponent>().state;
-                ecb.SetComponent<NPCSpawnerStateComponent>(
-                    stateCompEnt,
-                    new NPCSpawnerStateComponent{
-                        state = newState
-                    });
-                SetNewVariableRate(ref state, 16);
-            }
+            ecb.SetComponent<NPCSpawnerStateComponent>(
+                stateCompEnt,
+                new NPCSpawnerStateComponent{
+                    state = newState
+                });
         }
 
         [BurstCompile]
@@ -80,8 +70,7 @@ namespace GameWorld.NPCs
 
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
-            state.RequireForUpdate<UFOSpawnComponent>();
-            //state.RequireForUpdate<UFOSpawnerAspect>();
+            state.RequireForUpdate<SpawnerComponent>();
 
             m_UFOsGroup = state.GetEntityQuery(ComponentType.ReadOnly<UFOComponent>());
 
@@ -97,40 +86,40 @@ namespace GameWorld.NPCs
         }
 
         // should have just stored a couple corners entities :)
-        // used for random min max
+        // used for spawn min max
         [BurstCompile]
-        private (float3, float3) GetCorners2(ref SystemState state, NativeArray<Entity> boundsEnts){
+        private void GetCorners2(ref SystemState state, NativeArray<Entity> boundsEnts, out float3 targetAreaBL, out float3 targetAreaTR){
             float3 bl = float3.zero;
             float3 tr = float3.zero;
             foreach(Entity bndEnt in boundsEnts){
                 uint id = SystemAPI.GetComponent<BoundsTagComponent>(bndEnt).boundsID;
                 if(id == 0)
                     bl.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y+1.01f;
-                else
-                if(id == 1)
+                else if(id == 1)
                     bl.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x+1.01f;
-                else
-                if(id == 2)
+                else if(id == 2)
                     tr.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y-1.01f;
-                else
-                if(id == 3)
+                else if(id == 3)
                     tr.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x-1.01f;
             }
             boundsEnts.Dispose();
-            return (bl, tr);
+            targetAreaBL = bl;
+            targetAreaTR = tr;
         }
 
+        [BurstCompile]
         private void DoSpawnOnMap(  ref SystemState state, ref EntityCommandBuffer ecb, ref Entity stateCompEnt, 
                                     NPCSpawnerStateComponent.State spawnerState, int existingCount)
         {
-            UFOSpawnerAspect UFOSpawnAspect = SystemAPI.GetAspectRW<UFOSpawnerAspect>(stateCompEnt);
+            SpawnerAspect spawnAspect = SystemAPI.GetAspectRW<SpawnerAspect>(stateCompEnt);
             uint spawnAmount = 0;
-            var targetArea = (float3.zero, float3.zero);
+            float3 targetAreaBL = float3.zero;
+            float3 targetAreaTR = float3.zero;
             
             if(spawnerState == NPCSpawnerStateComponent.State.InGameSpawn)
             {
                 spawnAmount = 1;
-                targetArea = GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp));
+                GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
             }
             else if(spawnerState == NPCSpawnerStateComponent.State.Inactive){
                 return;
@@ -142,7 +131,8 @@ namespace GameWorld.NPCs
             {
                 ecb = ecb,
                 spawnAmount = spawnAmount,
-                targetArea = targetArea,
+                targetAreaBL = targetAreaBL,
+                targetAreaTR = targetAreaTR,
                 existingCount = existingCount,
                 rga = rga,
                 prefabsAndParents = prefabsAndParents
@@ -152,17 +142,7 @@ namespace GameWorld.NPCs
             //ecb.DestroyEntity(UFOSpawnAspect.UFOPrefab);
         }
 
-        private void SetNewVariableRate(ref SystemState state, uint rate)
-        {
-            // so this rate manager setting is only available as managed class, so no burst. 
-            // Weird because a default variable rate manager is a burstable struct.
-            // TODO: am I missing something here?
-            var asvrUpdateGroup = state.World.GetExistingSystemManaged<NpcSpawnerVRUpdateGroup>();
-            asvrUpdateGroup.SetRateManager(rate, false);
-            justUpdatedRate = true;
-        }
-
-        //[BurstCompile]
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             NPCSpawnerStateComponent spawnerState = SystemAPI.GetSingleton<NPCSpawnerStateComponent>();
@@ -171,38 +151,39 @@ namespace GameWorld.NPCs
             // This spawner system needs to run all the time (at a certain rate, unless game is paused), and otherwise it can be made `state.Enabled = false;`.
             if(spawnerState.state == NPCSpawnerStateComponent.State.InGameSpawn)
             {
-                if(!justUpdatedRate)
+                Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
+                var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
+                if(SystemAPI.Time.ElapsedTime - lastUpdateRateTime >= rateComponent.burstSpawnRate_ms)
                 {
                     //Debug.Log("[NPCSpawner][InGameSpawn] UFOe! "+existingUFOCount.ToString());
                     //TODO: I would actually like this mode to spawn UFOs from the edges only
 
-                    Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
                     var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                     var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                     int existingCount = m_UFOsGroup.CalculateEntityCount();
-                    UFOSpawnComponent ufoComp = SystemAPI.GetSingleton<UFOSpawnComponent>();
 
                     DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
 
                     {
-                    var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt).randomGeneratorArr;
-                    Unity.Mathematics.Random rg = rga[0];
-                    uint newRate = (uint)(math.min(20000, math.max(5000, ufoComp.inGameSpawnRate_ms + rg.NextInt(-5000,5000))));
-                    ufoComp.inGameSpawnRate_ms = newRate;
-                    rga[0] = rg;
-                    SetNewVariableRate(ref state, newRate);
-                    ecb.SetComponent<UFOSpawnComponent>(stateCompEnt, ufoComp);
+                    var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt);
+                    Unity.Mathematics.Random rg = rga.randomGeneratorArr[0];
+                    uint newRate = (uint)(math.min(20000, math.max(5000, rateComponent.inGameSpawnRate_ms + rg.NextInt(-5000,5000))));
+                    rga.randomGeneratorArr[0] = rg;
+                    ecb.SetComponent<RandomnessComponent>(stateCompEnt, rga);
+                    
+                    rateComponent.currentSpawnRate_ms = newRate;
+                    rateComponent.refreshSystemRateRequest = true;
+                    ecb.SetComponent<VariableRateComponent>(stateCompEnt, rateComponent);
                     }
+
                 }
-                else{
-                    justUpdatedRate = false;
-                }
+
             }
         }
     }
 
-    // if you really wanted, this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
-    //[BurstCompile]
+    // if you really wanted this job could be shared (e.g. asteroids, pickups, ufos). TODO: spawn these for loops in parallel instead
+    [BurstCompile]
     public partial struct NPCSpawnerJob:IJobEntity
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
@@ -213,25 +194,28 @@ namespace GameWorld.NPCs
         [ReadOnly]
         public int existingCount;
         [ReadOnly]
-        public (float3, float3) targetArea;
+        public float3 targetAreaBL;
+        [ReadOnly]
+        public float3 targetAreaTR;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public NativeArray<Unity.Mathematics.Random> rga;
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
-        //[BurstCompile]
-        private void Execute(UFOSpawnerAspect UFOSpawnAspect)
+        [BurstCompile]
+        private void Execute(SpawnerAspect spawnerAspect, NPCSpawnerStateComponent nssctag)
         {
             Unity.Mathematics.Random rg = rga[thri];
+
             for(uint i = 0; i < spawnAmount; i++){
-                if(i + existingCount >= UFOSpawnAspect.maxNumber){
+                if(i + existingCount >= spawnerAspect.maxNumber){
                     break;
                 }
                 
-                Entity UFO = ecb.Instantiate(prefabsAndParents[0].prefab);
+                Entity ent = ecb.Instantiate(prefabsAndParents[0].prefab);
 
-                ecb.SetComponent<LocalTransform>(UFO, UFOSpawnAspect.GetUFOTransform(ref rg, targetArea));
+                ecb.SetComponent<LocalTransform>(ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
 
-                ecb.AddComponent<Unity.Transforms.Parent>(UFO, new Unity.Transforms.Parent{ 
+                ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
                         Value = prefabsAndParents[0].parent
                 });
             }

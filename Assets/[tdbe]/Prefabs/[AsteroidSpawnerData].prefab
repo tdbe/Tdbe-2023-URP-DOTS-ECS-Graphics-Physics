@@ -9,10 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4121871349082483645}
-  - component: {fileID: 4121871349082483647}
   - component: {fileID: 4121871349082483633}
   - component: {fileID: 4121871349082483632}
   - component: {fileID: 4121871349082483634}
+  - component: {fileID: 5846359511261124064}
+  - component: {fileID: 725448847757670726}
   m_Layer: 0
   m_Name: '[AsteroidSpawnerData]'
   m_TagString: Untagged
@@ -35,24 +36,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4121871349082483647
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4121871349082483644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b970daf36319a68409f9f01e23c77dda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxNumber: 1000
-  zRange: 1
-  decorativeRandomScaleBump: 0.05
-  initialNumber: 10
-  initialImpulse: 1.25
-  inGameSpawnRate_ms: 3000
 --- !u!114 &4121871349082483633
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -95,3 +78,38 @@ MonoBehaviour:
   - {fileID: 85503138005864851, guid: cf25a3e481c490240a21515cf1c3f8c7, type: 3}
   parents:
   - {fileID: 0}
+--- !u!114 &5846359511261124064
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4121871349082483644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fe4ba960d260974fbf35e9eaa0e2400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  burstSpawnRate_ms: 16
+  inGameSpawnRate_ms: 3000
+  currentSpawnRate_ms: 16
+--- !u!114 &725448847757670726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4121871349082483644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72acf8caf1b86e6418f3f3961af9ed3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxNumber: 1000
+  zRange: 0
+  randScaleMin: -0.05
+  randScaleMax: 0.05
+  scaleBump: 0
+  coinTossOnScaleMod: 0
+  initialNumber: 10
+  initialImpulse: 1.25

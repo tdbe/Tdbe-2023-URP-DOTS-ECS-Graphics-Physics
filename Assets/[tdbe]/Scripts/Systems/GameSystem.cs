@@ -48,7 +48,6 @@ namespace GameWorld
                 {
                     ecb = ecb
                 }.Schedule(m_boundsGroup, state.Dependency);
-     
                 jhandle.Complete();
             }
         }
@@ -70,19 +69,37 @@ namespace GameWorld
 
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                SetBounds(ref state, ref ecb, true);
-
-                var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
-                var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
-                asteroidSpawner.SetNewRateState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff);
-
-                sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
-                var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
-                npcSpawner.SetNewRateState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
-
-                sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
-                var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
-                pickupsSpawner.SetNewRateState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
+                
+                // update variable rate systems states/rates
+                {
+                    var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
+                    var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
+                    asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff);
+                }
+                {
+                    var entSingleton = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
+                    var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
+                    {
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
+                        var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
+                        npcSpawner.SetNewRate(ref state);
+                        npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
+                        variRateComp.refreshSystemRateRequest = false;
+                        ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
+                    }
+                }
+                {
+                    var entSingleton = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
+                    var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
+                    {
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
+                        var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
+                        pickupsSpawner.SetNewRate(ref state);
+                        pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
+                        variRateComp.refreshSystemRateRequest = false;
+                        ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
+                    }
+                }
 
                 // transition to running
                 ecb.SetComponent<GameSystemStateComponent>(
@@ -91,12 +108,57 @@ namespace GameWorld
                         state = GameSystemStateComponent.State.Running
                     });
 
+                ecb = new EntityCommandBuffer(Allocator.TempJob);
+                SetBounds(ref state, ref ecb, true);
+                ecb.Playback(state.EntityManager);
             }
             else if(gameState.state == GameSystemStateComponent.State.Running)
             {
-                var ecb = new EntityCommandBuffer(Allocator.TempJob);
+                var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+                // update variable rate systems states/rates
+                {
+                    var entSingleton = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
+                    var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
+                    if(variRateComp.refreshSystemRateRequest)
+                    {
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
+                        var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
+                        pickupsSpawner.SetNewRate(ref state);
+                        pickupsSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
+                        variRateComp.refreshSystemRateRequest = false;
+                        ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
+                    }
+                }
+                {
+                    var entSingleton = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
+                    var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
+                    if(variRateComp.refreshSystemRateRequest)
+                    {
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
+                        var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
+                        npcSpawner.SetNewRate(ref state);
+                        npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
+                        variRateComp.refreshSystemRateRequest = false;
+                        ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
+                    }
+                }
+                {
+                    var entSingleton = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
+                    var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
+                    if(variRateComp.refreshSystemRateRequest)
+                    {
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
+                        var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
+                        pickupsSpawner.SetNewRate(ref state);
+                        pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
+                        variRateComp.refreshSystemRateRequest = false;
+                        ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
+                    }
+                }
+
+                ecb = new EntityCommandBuffer(Allocator.TempJob);
                 SetBounds(ref state, ref ecb, false);
-            
                 ecb.Playback(state.EntityManager);
             }
             else if(gameState.state == GameSystemStateComponent.State.Ending)

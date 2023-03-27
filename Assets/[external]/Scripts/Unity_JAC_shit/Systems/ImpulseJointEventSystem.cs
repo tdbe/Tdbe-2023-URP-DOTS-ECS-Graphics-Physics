@@ -36,7 +36,7 @@ namespace Unity.Physics.SimulationEvents
         {
             [ReadOnly] public BufferLookup<PhysicsJointCompanion> JointCompanionBuffer;
             public EntityCommandBuffer CommandBuffer;
-
+            [BurstCompile]
             public void Execute(ImpulseEvent impulseEvent)
             {
                 Assertions.Assert.IsTrue(impulseEvent.Type == ConstraintType.Linear || impulseEvent.Type == ConstraintType.Angular, "Motorized constraints should not break!");

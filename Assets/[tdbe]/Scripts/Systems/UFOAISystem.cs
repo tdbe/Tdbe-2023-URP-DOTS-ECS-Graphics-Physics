@@ -39,6 +39,7 @@ namespace GameWorld.NPCs
     public partial struct UFOChaseJob:IJobEntity
     {
         public EntityCommandBuffer ecb;
+        [BurstCompile]
         private void Execute(in Entity bndEnt, in LocalTransform lt, in BoundsTagComponent tagC)
         {
             /*

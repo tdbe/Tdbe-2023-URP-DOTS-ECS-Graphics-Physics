@@ -37,9 +37,9 @@ namespace GameWorld
             var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
             new SpawnerJob
             {
-                ecb = ecb,
+                ecbp = ecb.AsParallelWriter(),
                 prefabsAndParents = prefabsAndParents
-            }.Schedule(spawnerEQG);
+            }.ScheduleParallel(spawnerEQG);
         
             state.Enabled = false;
         }
@@ -48,24 +48,25 @@ namespace GameWorld
     [BurstCompile]
     public partial struct SpawnerJob:IJobEntity
     {
-        public EntityCommandBuffer ecb;
+        public EntityCommandBuffer.ParallelWriter ecbp;
+        [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
         [BurstCompile]
-        private void Execute(in PrefabSpawnerComponent spawnerComp)
+        private void Execute([ChunkIndexInQuery] int ciqi, in PrefabSpawnerComponent spawnerComp)
         {
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
             for(uint i = 0; i < spawnerComp.spawnNumber; i++){
-                Entity prefabInstance = ecb.Instantiate(prefabsAndParents[0].prefab);
+                Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
                 
-                ecb.AddComponent<Unity.Transforms.Parent>(prefabInstance, new Unity.Transforms.Parent{ 
+                ecbp.AddComponent<Unity.Transforms.Parent>(ciqi, prefabInstance, new Unity.Transforms.Parent{ 
                     Value = prefabsAndParents[0].parent
                 });
 
-                ecb.SetComponent<BoundsTagComponent>(prefabInstance, new BoundsTagComponent{
+                ecbp.SetComponent<BoundsTagComponent>(ciqi, prefabInstance, new BoundsTagComponent{
                     boundsID = i
                 });
             }
-            ecb.DestroyEntity(prefabsAndParents[0].prefab);     
+            ecbp.DestroyEntity(ciqi, prefabsAndParents[0].prefab);     
             //spawnerCompArr.Dispose();
         }
     }

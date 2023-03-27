@@ -32,56 +32,44 @@ namespace GameWorld.Asteroid
     {
         private EntityQuery m_asteroidsGroup;
         private EntityQuery m_boundsGroup;
-        private AsteroidSpawnerStateComponent.State prevState;
 
-        // Set from other systems, because variable rate. (would like to debate how good and bad of an idea this is)
-        public void SetNewRateState(ref SystemState state, AsteroidSpawnerStateComponent.State newState)
+        // Need to set variable rate from other systems
+        public void SetNewRate(ref SystemState state)
         {
             // var ecb = new EntityCommandBuffer(Allocator.Temp);
             var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
-            SetNewRateState(ref state, ref ecb, newState);
-            //ecb.Playback(state.EntityManager);
+            Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
+            uint rate = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt).currentSpawnRate_ms;
+
+            var asvrUpdateGroup = state.World.GetExistingSystemManaged<AsteroidSpawnerVRUpdateGroup>();
+            asvrUpdateGroup.SetRateManager(rate, true);
+        }
+
+        public void SetNewState(ref SystemState state, AsteroidSpawnerStateComponent.State newState)
+        {
+            // var ecb = new EntityCommandBuffer(Allocator.Temp);
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            
+            Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
+            //prevState = SystemAPI.GetSingleton<AsteroidSpawnerStateComponent>().state;
+            ecb.SetComponent<AsteroidSpawnerStateComponent>(
+                stateCompEnt,
+                new AsteroidSpawnerStateComponent{
+                    state = newState
+                });
         }
         
-        private void SetNewRateState(ref SystemState state, ref EntityCommandBuffer ecb, AsteroidSpawnerStateComponent.State newState)
-        {
-            // handle transition to next state, and also prepare the variable rate update rate
-            
-            Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
-
-            if(newState == AsteroidSpawnerStateComponent.State.InGameSpawn)
-            {
-                
-                prevState = SystemAPI.GetSingleton<AsteroidSpawnerStateComponent>().state;
-                ecb.SetComponent<AsteroidSpawnerStateComponent>(
-                    stateCompEnt,
-                    new AsteroidSpawnerStateComponent{
-                        state = newState
-                    });
-                SetNewVariableRate(ref state, false);
-            }
-            else{
-
-                prevState = SystemAPI.GetSingleton<AsteroidSpawnerStateComponent>().state;
-                ecb.SetComponent<AsteroidSpawnerStateComponent>(
-                    stateCompEnt,
-                    new AsteroidSpawnerStateComponent{
-                        state = newState
-                    });
-                SetNewVariableRate(ref state, true);
-            }
-        }
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<AsteroidSpawnerComponent>();
+            state.RequireForUpdate<SpawnerComponent>();
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
             state.RequireForUpdate<AsteroidSpawnerStateComponent>();
-            //state.RequireForUpdate<AsteroidSpawnerAspect>();
 
             m_asteroidsGroup = state.GetEntityQuery(ComponentType.ReadOnly<AsteroidSizeComponent>());
 
@@ -97,45 +85,45 @@ namespace GameWorld.Asteroid
         }
 
         // should have just stored a couple corners entities :)
-        // used for random min max
+        // used for spawn min max
         [BurstCompile]
-        private (float3, float3) GetCorners2(ref SystemState state, NativeArray<Entity> boundsEnts){
+        private void GetCorners2(ref SystemState state, NativeArray<Entity> boundsEnts, out float3 targetAreaBL, out float3 targetAreaTR){
             float3 bl = float3.zero;
             float3 tr = float3.zero;
             foreach(Entity bndEnt in boundsEnts){
                 uint id = SystemAPI.GetComponent<BoundsTagComponent>(bndEnt).boundsID;
                 if(id == 0)
                     bl.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y+1.01f;
-                else
-                if(id == 1)
+                else if(id == 1)
                     bl.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x+1.01f;
-                else
-                if(id == 2)
+                else if(id == 2)
                     tr.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y-1.01f;
-                else
-                if(id == 3)
+                else if(id == 3)
                     tr.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x-1.01f;
             }
             boundsEnts.Dispose();
-            return (bl, tr);
+            targetAreaBL = bl;
+            targetAreaTR = tr;
         }
 
+        [BurstCompile]
         private void DoSpawnOnMap(  ref SystemState state, ref EntityCommandBuffer ecb, ref Entity stateCompEnt, 
                                     AsteroidSpawnerStateComponent.State spawnerState, int existingCount)
         {
-            AsteroidSpawnerAspect asteroidSpawnAspect = SystemAPI.GetAspectRW<AsteroidSpawnerAspect>(stateCompEnt);
+            SpawnerAspect spawnAspect = SystemAPI.GetAspectRW<SpawnerAspect>(stateCompEnt);
             uint spawnAmount = 0;
-            var targetArea = (float3.zero, float3.zero);
+            float3 targetAreaBL = float3.zero;
+            float3 targetAreaTR = float3.zero;
             
             if(spawnerState == AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff)
             {
-                spawnAmount = asteroidSpawnAspect.initialNumber;
-                targetArea = GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp));
+                spawnAmount = spawnAspect.initialNumber;
+                GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
             }
             else if(spawnerState == AsteroidSpawnerStateComponent.State.InGameSpawn)
             {
                 spawnAmount = 1;
-                targetArea = GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp));
+                GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
             }
             else if(spawnerState == AsteroidSpawnerStateComponent.State.TargetedSpawn_oneoff)
             {
@@ -163,45 +151,22 @@ namespace GameWorld.Asteroid
 
             var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt).randomGeneratorArr;
             var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
-            new AsteroidSpawnerJob
+            var jhandle = new AsteroidSpawnerJob
             {
                 ecb = ecb,
                 spawnAmount = spawnAmount,
-                targetArea = targetArea,
+                targetAreaBL = targetAreaBL,
+                targetAreaTR = targetAreaTR,
                 existingCount = existingCount,
                 rga = rga,
                 prefabsAndParents = prefabsAndParents
-            }.Schedule();
+            }.Schedule(state.Dependency);
 
-           
+           jhandle.Complete();
             //ecb.DestroyEntity(asteroidSpawnAspect.asteroidPrefab);
         }
 
-        private void SetNewVariableRate(ref SystemState state, bool fast)
-        {
-            uint rate = 16;
-            if(!fast)
-            {
-                rate = SystemAPI.GetSingleton<AsteroidSpawnerComponent>().inGameSpawnRate_ms;
-            }
-            /*
-            // me figuring this out...
-            var rateManager = new RateUtils.VariableRateManager(rate, true);
-            //var variableRateSystem = state.World.GetExistingSystem<VariableRateSimulationSystemGroup>();
-            var variableRateSystem = World.DefaultGameObjectInjectionWorld.GetExistingSystemManaged<VariableRateSimulationSystemGroup>();
-            variableRateSystem.SetRateManagerCreateAllocator(rateManager);
-            */
-            // https://forum.unity.com/threads/enable-disable-systems-programmatically-in-1-0.1389423/#post-8760574
-
-
-            // so this rate manager setting is only available as managed class, so no burst. 
-            // Weird because a default variable rate manager is a burstable struct.
-            // TODO: am I missing something here?
-            var asvrUpdateGroup = state.World.GetExistingSystemManaged<AsteroidSpawnerVRUpdateGroup>();
-            asvrUpdateGroup.SetRateManager(rate, true);
-        }
-
-        //[BurstCompile]
+        [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             // I want the game to constantly spawn new asteroids.
@@ -215,20 +180,25 @@ namespace GameWorld.Asteroid
             if(spawnerState.state == AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff)
             {
                 Debug.Log("[AsteroidSpawner][InitialSpawn] spawning. ");
-                Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
+                Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 
                 int existingCount = m_asteroidsGroup.CalculateEntityCount();
                 DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
                 
-                ecb = new EntityCommandBuffer(Allocator.Temp);
-                SetNewRateState(ref state, ref ecb, AsteroidSpawnerStateComponent.State.InGameSpawn);
-                ecb.Playback(state.EntityManager);
+                {
+                // revert to AsteroidSpawnerStateComponent.State.InGameSpawn
+                SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
+                var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
+                rateComponent.currentSpawnRate_ms = rateComponent.inGameSpawnRate_ms; 
+                rateComponent.refreshSystemRateRequest = true;
+                ecb.SetComponent<VariableRateComponent>(stateCompEnt, rateComponent);
+                }
             }
             else if(spawnerState.state == AsteroidSpawnerStateComponent.State.InGameSpawn)
             {
-                Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
+                Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 
@@ -238,22 +208,27 @@ namespace GameWorld.Asteroid
             }
             else if(spawnerState.state == AsteroidSpawnerStateComponent.State.TargetedSpawn_oneoff)
             {
-                Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerComponent>();
+                Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
                 int existingCount = m_asteroidsGroup.CalculateEntityCount();
                 DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
 
-                ecb = new EntityCommandBuffer(Allocator.Temp);
-                SetNewRateState(ref state, ref ecb, prevState);
-                ecb.Playback(state.EntityManager);
+                {
+                // revert to AsteroidSpawnerStateComponent.State.InGameSpawn
+                SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
+                var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
+                rateComponent.currentSpawnRate_ms = rateComponent.inGameSpawnRate_ms; 
+                rateComponent.refreshSystemRateRequest = true;
+                ecb.SetComponent<VariableRateComponent>(stateCompEnt, rateComponent);
+                }
             }
         }
     }
 
-    // if you really wanted, this could be shared with other spawn jobs (e.g. asteroids, pickups, ufos)
-    //[BurstCompile]
+    // if you really wanted this job could be shared (e.g. asteroids, pickups, ufos). TODO: spawn these for loops in parallel instead
+    [BurstCompile]
     public partial struct AsteroidSpawnerJob:IJobEntity
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
@@ -264,15 +239,17 @@ namespace GameWorld.Asteroid
         [ReadOnly]
         public int existingCount;
         [ReadOnly]
-        public (float3, float3) targetArea;
+        public float3 targetAreaBL;
+        [ReadOnly]
+        public float3 targetAreaTR;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
         public NativeArray<Unity.Mathematics.Random> rga;
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
 
         // TODO: can you do parallel spawning, like this?: ecb.parallelwriter, a pre-spawned query of entities to send to this parallel thread, and here add components to each in parallel
-        //[BurstCompile]
-        private void Execute(AsteroidSpawnerAspect asteroidSpawnAspect)
+        [BurstCompile]
+        private void Execute(SpawnerAspect asteroidSpawnAspect, AsteroidSpawnerStateComponent assctag)
         {
             Unity.Mathematics.Random rg = rga[thri];
             for(uint i = 0; i < spawnAmount; i++){
@@ -281,18 +258,18 @@ namespace GameWorld.Asteroid
                     break;
                 }
                 
-                Entity asteroid = ecb.Instantiate(prefabsAndParents[0].prefab);
+                Entity ent = ecb.Instantiate(prefabsAndParents[0].prefab);
 
-                ecb.SetComponent<LocalTransform>(asteroid, asteroidSpawnAspect.GetAsteroidTransform(ref rg, targetArea));
-
-                ecb.SetComponent<PhysicsVelocity>(asteroid, asteroidSpawnAspect.GetPhysicsVelocity(ref rg));
+                ecb.SetComponent<LocalTransform>(ent, asteroidSpawnAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
+                // I'll use physicsVelocity when I get to the Player move forces.
+                ecb.SetComponent<PhysicsVelocity>(ent, asteroidSpawnAspect.GetPhysicsVelocity(ref rg));
 
                 //TODO: still wanted like this? change to authoring?
-                ecb.AddSharedComponent<AsteroidStateSharedComponent>(asteroid, new AsteroidStateSharedComponent{ 
+                ecb.AddSharedComponent<AsteroidStateSharedComponent>(ent, new AsteroidStateSharedComponent{ 
                         asteroidState = AsteroidStateSharedComponent.AsteroidState.Inactive
                 });
 
-                ecb.AddComponent<Unity.Transforms.Parent>(asteroid, new Unity.Transforms.Parent{ 
+                ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
                         Value = prefabsAndParents[0].parent
                 });
             }

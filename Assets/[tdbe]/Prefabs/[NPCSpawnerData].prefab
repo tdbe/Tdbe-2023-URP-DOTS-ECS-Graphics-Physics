@@ -9,10 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 655476544564341866}
-  - component: {fileID: 655476544564341871}
   - component: {fileID: 655476544564341865}
   - component: {fileID: 655476544564341870}
   - component: {fileID: 655476544564341869}
+  - component: {fileID: 7289004284015833794}
+  - component: {fileID: 2621378525696565717}
   m_Layer: 0
   m_Name: '[NPCSpawnerData]'
   m_TagString: Untagged
@@ -35,22 +36,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &655476544564341871
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 655476544564341867}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9e3e17fa23a776a4d8a8c89f2711af1b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxNumber: 3
-  zRange: 1
-  decorativeRandomScaleBump: 1.4
-  inGameSpawnRate_ms: 12500
 --- !u!114 &655476544564341865
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,3 +78,38 @@ MonoBehaviour:
   - {fileID: 1998748012411953420, guid: a711458aca0b22042996882e3a84b657, type: 3}
   parents:
   - {fileID: 0}
+--- !u!114 &7289004284015833794
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655476544564341867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7fe4ba960d260974fbf35e9eaa0e2400, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  burstSpawnRate_ms: 16
+  inGameSpawnRate_ms: 12500
+  currentSpawnRate_ms: 12500
+--- !u!114 &2621378525696565717
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655476544564341867}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72acf8caf1b86e6418f3f3961af9ed3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxNumber: 3
+  zRange: 0
+  randScaleMin: 0
+  randScaleMax: 0
+  scaleBump: 0.4
+  coinTossOnScaleMod: 1
+  initialNumber: 0
+  initialImpulse: 0
