@@ -1,9 +1,10 @@
 using Unity.Entities;
 
-namespace GameWorld.Asteroid
+namespace GameWorld.Players
 {
     public struct PlayerComponent : IComponentData
     {
-            
+        public double spawnTime;
+        // isCollisionInvulnerable as tag 
     }
 }

@@ -13,9 +13,9 @@ namespace GameWorld
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<PrefabSpawnerComponent>();
+            state.RequireForUpdate<SimpleSpawnerComponent>();
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
-            spawnerEQG = state.GetEntityQuery(ComponentType.ReadOnly<PrefabSpawnerComponent>());
+            spawnerEQG = state.GetEntityQuery(ComponentType.ReadOnly<SimpleSpawnerComponent>());
             
         }
 
@@ -28,12 +28,12 @@ namespace GameWorld
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            PrefabSpawnerComponent spawnerComp = SystemAPI.GetSingleton<PrefabSpawnerComponent>();
+            SimpleSpawnerComponent spawnerComp = SystemAPI.GetSingleton<SimpleSpawnerComponent>();
             var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             Debug.Log("[PrefabSpawner][InitialSpawn] spawning. ");
 
-            Entity stateCompEnt = SystemAPI.GetSingletonEntity<PrefabSpawnerComponent>();
+            Entity stateCompEnt = SystemAPI.GetSingletonEntity<SimpleSpawnerComponent>();
             var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
             new SpawnerJob
             {
@@ -52,15 +52,17 @@ namespace GameWorld
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
         [BurstCompile]
-        private void Execute([ChunkIndexInQuery] int ciqi, in PrefabSpawnerComponent spawnerComp)
+        private void Execute([ChunkIndexInQuery] int ciqi, in SimpleSpawnerComponent spawnerComp)
         {
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
             for(uint i = 0; i < spawnerComp.spawnNumber; i++){
                 Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
-                
-                ecbp.AddComponent<Unity.Transforms.Parent>(ciqi, prefabInstance, new Unity.Transforms.Parent{ 
-                    Value = prefabsAndParents[0].parent
-                });
+
+                if(prefabsAndParents.Length>0){
+                    ecbp.AddComponent<Unity.Transforms.Parent>(ciqi, prefabInstance, new Unity.Transforms.Parent{ 
+                        Value = prefabsAndParents[0].parent
+                    });
+                }
 
                 ecbp.SetComponent<BoundsTagComponent>(ciqi, prefabInstance, new BoundsTagComponent{
                     boundsID = i

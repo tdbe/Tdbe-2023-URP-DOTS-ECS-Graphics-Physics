@@ -29,10 +29,10 @@ namespace GameWorld.Pickups
     [BurstCompile]
     public partial struct PickupsSpawnerSystem : ISystem
     {
-        private EntityQuery m_PickupsGroupShield;
-        private EntityQuery m_PickupsGroupGun;
+        private EntityQuery m_allPickups;
         private EntityQuery m_boundsGroup;
         // TODO: this is me screwing around. There has to be a better way, but there are no docs yet.
+        // Maybe IRateManager? No examples, no time to experiment for now.
         private double lastUpdateRateTime;
 
         // Need to set variable rate from other systems
@@ -73,9 +73,9 @@ namespace GameWorld.Pickups
             state.RequireForUpdate<RandomnessComponent>();
             state.RequireForUpdate<SpawnerComponent>();
 
-            // TODO: is there a filter for one OR another? as in, one || another?
-            m_PickupsGroupShield = state.GetEntityQuery(ComponentType.ReadOnly<ShieldPickupTag>());
-            m_PickupsGroupGun = state.GetEntityQuery(ComponentType.ReadOnly<GunPickupTag>());
+            // WithAll and WithAny literally don't show up in the unity docs search.
+            // Thought they were replaced.
+            m_allPickups = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp).WithAny<ShieldPickupTag, GunPickupTag>());
 
             state.RequireForUpdate<BoundsTagComponent>();
             m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
@@ -162,7 +162,7 @@ namespace GameWorld.Pickups
 
                     var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                     var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                    int existingCount = m_PickupsGroupShield.CalculateEntityCount() + m_PickupsGroupGun.CalculateEntityCount();
+                    int existingCount = m_allPickups.CalculateEntityCount();
                     SpawnerComponent stateComp = SystemAPI.GetComponent<SpawnerComponent>(stateCompEnt);
                     
                     if(existingCount < stateComp.maxNumber){
@@ -222,9 +222,11 @@ namespace GameWorld.Pickups
                 // Actually I do need to set e.g. velocity/mass so it doesn't stop spinning.
                 ecb.SetComponent<PhysicsVelocity>(ent, spawnerAspect.GetPhysicsVelocity());
 
-                ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
-                        Value = prefabsAndParents[which].parent
-                });
+                if(prefabsAndParents.Length>which){
+                    ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
+                            Value = prefabsAndParents[which].parent
+                    });
+                }
             }
             rga[thri] = rg;
         }

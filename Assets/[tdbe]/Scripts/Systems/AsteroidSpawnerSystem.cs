@@ -269,9 +269,11 @@ namespace GameWorld.Asteroid
                         asteroidState = AsteroidStateSharedComponent.AsteroidState.Inactive
                 });
 
-                ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
-                        Value = prefabsAndParents[0].parent
-                });
+                if(prefabsAndParents.Length>0){
+                    ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
+                            Value = prefabsAndParents[0].parent
+                    });
+                }
             }
             rga[thri] = rg;
         }

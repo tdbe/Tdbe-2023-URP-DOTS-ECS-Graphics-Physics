@@ -19,7 +19,7 @@ namespace GameWorld
         [Header("Scale add, which is optionally applied on a coin toss.")]
         public float scaleBump = 0f;
         [Header("Coin toss on whether ^ scale mods are applied.\n Off means always applied.")]
-        public bool coinTossOnScaleMod = true;
+        public bool coinTossOnScaleMod;
         [Header("The number spawned on game start / reset.")]
         public uint initialNumber = 10; 
         [Header("Value for an initial impulse force.")]

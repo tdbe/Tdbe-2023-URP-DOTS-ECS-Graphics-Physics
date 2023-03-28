@@ -24,6 +24,9 @@ namespace GameWorld
             m_boundsTCL = state.GetComponentLookup<BoundsTagComponent>(true);
             m_warpableTCL = state.GetComponentLookup<WarpableTag>(false);
             m_ltransTCL = state.GetComponentLookup<LocalTransform>(false);
+
+            state.RequireForUpdate<WarpableTag>();
+            state.RequireForUpdate<BoundsTagComponent>();
         }
 
         [BurstCompile]
@@ -50,6 +53,7 @@ namespace GameWorld
                 localTransformComponent = m_ltransTCL
             };
             state.Dependency = jhandle.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
+            // X_X singlethreaded physics
         }
 
     }

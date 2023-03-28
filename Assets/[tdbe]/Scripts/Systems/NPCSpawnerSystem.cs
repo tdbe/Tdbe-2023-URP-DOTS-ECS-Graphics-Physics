@@ -32,6 +32,7 @@ namespace GameWorld.NPCs
         private EntityQuery m_UFOsGroup;
         private EntityQuery m_boundsGroup;
         // TODO: this is me screwing around. There has to be a better way, but there are no docs yet.
+        // Maybe IRateManager? No examples, no time to experiment for now.
         private double lastUpdateRateTime;
 
         // Need to set variable rate from other systems
@@ -215,9 +216,11 @@ namespace GameWorld.NPCs
 
                 ecb.SetComponent<LocalTransform>(ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
 
-                ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
-                        Value = prefabsAndParents[0].parent
-                });
+                if(prefabsAndParents.Length>0){
+                    ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
+                            Value = prefabsAndParents[0].parent
+                    });
+                }
             }
             rga[thri] = rg;
         }

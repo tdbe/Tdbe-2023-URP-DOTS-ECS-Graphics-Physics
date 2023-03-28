@@ -6,7 +6,7 @@ namespace GameWorld
 {
     public class PrefabAndParentAuthoring : MonoBehaviour
     {
-        [Header("One or more. But both these arrays \nmust always have the same length.")]
+        [Header("One or more.You can leave the parent empty.")]
         public GameObject[] prefabs;
         public GameObject[] parents;
 
