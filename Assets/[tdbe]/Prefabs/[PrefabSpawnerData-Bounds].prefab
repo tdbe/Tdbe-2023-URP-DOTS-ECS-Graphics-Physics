@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 1071886311901440050}
   - component: {fileID: 1071886311901440051}
   m_Layer: 0
-  m_Name: '[PrefabSpawnerData]'
+  m_Name: '[PrefabSpawnerData-Bounds]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -1,19 +1,23 @@
 using UnityEngine;
 using Unity.Entities;
+using Unity.Physics;
 
 namespace GameWorld.Players
 {
     public class PlayerAuthoring : MonoBehaviour
     {
-        [Header("Stores when player was spawned. For score etc.")]
-        public double spawnTime;
+        public float moveSpeed= 5;
+        public float rotateSpeed= 1;
+
         public class PlayerBaker : Baker<PlayerAuthoring>
         {
             public override void Bake(PlayerAuthoring authoring)
             {
                 AddComponent<PlayerComponent>(new PlayerComponent{
-                   spawnTime = authoring.spawnTime
+                   moveSpeed = authoring.moveSpeed,
+                   rotateSpeed = authoring.rotateSpeed
                 });
+                
             }
         }
     }

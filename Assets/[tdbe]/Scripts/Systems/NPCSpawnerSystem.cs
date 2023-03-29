@@ -16,10 +16,12 @@ namespace GameWorld.NPCs
         {
             // NOTE: Unity.Entities.RateUtils.VariableRateManager.MinUpdateRateMS
             RateManager = new RateUtils.VariableRateManager(16, true);
+           
         }
 
         public void SetRateManager(uint ms, bool pushToWorld){
             RateManager = new RateUtils.VariableRateManager(ms, pushToWorld);
+            
         }
     }
 
@@ -31,29 +33,23 @@ namespace GameWorld.NPCs
     {
         private EntityQuery m_UFOsGroup;
         private EntityQuery m_boundsGroup;
-        // TODO: this is me screwing around. There has to be a better way, but there are no docs yet.
-        // Maybe IRateManager? No examples, no time to experiment for now.
-        private double lastUpdateRateTime;
 
         // Need to set variable rate from other systems
         public void SetNewRate(ref SystemState state)
         {
-            // var ecb = new EntityCommandBuffer(Allocator.Temp);
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-            
             Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
-            uint rate = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt).currentSpawnRate_ms;
-
+            var vrcomp = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
+            uint rate = vrcomp.currentSpawnRate_ms;
+            
             var asvrUpdateGroup = state.World.GetExistingSystemManaged<NPCSpawnerVRUpdateGroup>();
             asvrUpdateGroup.SetRateManager(rate, true);
-            lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
+            
         }
 
         public void SetNewState(ref SystemState state, NPCSpawnerStateComponent.State newState)
         {
             // var ecb = new EntityCommandBuffer(Allocator.Temp);
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
@@ -139,7 +135,7 @@ namespace GameWorld.NPCs
                 prefabsAndParents = prefabsAndParents
             }.Schedule(state.Dependency);
 
-           jhandle.Complete();
+            jhandle.Complete();
             //ecb.DestroyEntity(UFOSpawnAspect.UFOPrefab);
         }
 
@@ -154,31 +150,36 @@ namespace GameWorld.NPCs
             {
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
-                if(SystemAPI.Time.ElapsedTime - lastUpdateRateTime >= rateComponent.burstSpawnRate_ms)
+                
+                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= rateComponent.burstSpawnRate_ms*0.001f)
                 {
                     //Debug.Log("[NPCSpawner][InGameSpawn] UFOe! "+existingUFOCount.ToString());
                     //TODO: I would actually like this mode to spawn UFOs from the edges only
-
-                    var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
-                    var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                    int existingCount = m_UFOsGroup.CalculateEntityCount();
-
-                    DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
-
-                    {
-                    var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt);
-                    Unity.Mathematics.Random rg = rga.randomGeneratorArr[0];
-                    uint newRate = (uint)(math.min(20000, math.max(5000, rateComponent.inGameSpawnRate_ms + rg.NextInt(-5000,5000))));
-                    rga.randomGeneratorArr[0] = rg;
-                    ecb.SetComponent<RandomnessComponent>(stateCompEnt, rga);
                     
-                    rateComponent.currentSpawnRate_ms = newRate;
-                    rateComponent.refreshSystemRateRequest = true;
-                    ecb.SetComponent<VariableRateComponent>(stateCompEnt, rateComponent);
+                    int existingCount = m_UFOsGroup.CalculateEntityCount();
+                    SpawnerComponent stateComp = SystemAPI.GetComponent<SpawnerComponent>(stateCompEnt);
+
+                    if(existingCount < stateComp.maxNumber)
+                    {
+                        var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+                        DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
+
+                        // we want to slightly randomize the updategroup update rate
+                        {
+                        var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt);
+                        Unity.Mathematics.Random rg = rga.randomGeneratorArr[0];
+                        uint newRate = (uint)(math.min(20000, math.max(5000, rateComponent.inGameSpawnRate_ms + rg.NextInt(-5000,5000))));
+                        rga.randomGeneratorArr[0] = rg;
+                        ecb.SetComponent<RandomnessComponent>(stateCompEnt, rga);
+                        
+                        rateComponent.currentSpawnRate_ms = newRate;
+                        rateComponent.refreshSystemRateRequest = true;
+                        ecb.SetComponent<VariableRateComponent>(stateCompEnt, rateComponent);
+                        }
                     }
 
                 }
-
             }
         }
     }

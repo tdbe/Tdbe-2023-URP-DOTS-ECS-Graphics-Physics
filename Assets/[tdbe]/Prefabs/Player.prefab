@@ -768,13 +768,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7215400412842331241}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.78, z: -2.66}
+  m_LocalPosition: {x: 0, y: -0.5, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6368042545114531157}
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &5970058575095559313
 Rigidbody:
@@ -785,8 +785,8 @@ Rigidbody:
   m_GameObject: {fileID: 7215400412842331241}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
+  m_Drag: 0.02
+  m_AngularDrag: 0.04
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -818,8 +818,8 @@ MonoBehaviour:
   m_MotionType: 0
   m_Smoothing: 0
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0
+  m_LinearDamping: 0.05
+  m_AngularDamping: 0.1
   m_InitialLinearVelocity:
     x: 0
     y: 0
@@ -869,16 +869,16 @@ MonoBehaviour:
   ConnectedBody: {fileID: 0}
   EnableCollision: 0
   MaxImpulse:
-    x: Infinity
-    y: Infinity
-    z: Infinity
+    x: 0.5
+    y: 0.5
+    z: 0.5
   LockLinearAxes:
     x: 0
     y: 0
     z: 1
   LockAngularAxes:
-    x: 0
-    y: 0
+    x: 1
+    y: 1
     z: 0
 --- !u!114 &-3081616015688867146
 MonoBehaviour:
@@ -905,7 +905,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d29c35a3005035418b76c4a8c7ad318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  spawnTime: 0
+  moveSpeed: 1
+  rotateSpeed: 1
 --- !u!114 &7394668203450522924
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -918,6 +919,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e1dbff752b63b747aa599dbce1b4bef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Up: 273
+  Down: 274
+  Left: 276
+  Right: 275
+  Shoot: 305
+  Teleport: 303
 --- !u!114 &-8852127702617716055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1064,8 +1071,9 @@ GameObject:
   - component: {fileID: 9087535410931787744}
   - component: {fileID: 6172256869129709443}
   - component: {fileID: 4013478621445205243}
+  - component: {fileID: 3025070677140738270}
   m_Layer: 20
-  m_Name: part (4)
+  m_Name: collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1152,7 +1160,7 @@ CapsuleCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 2
@@ -1160,6 +1168,149 @@ CapsuleCollider:
   m_Height: 5.6
   m_Direction: 1
   m_Center: {x: 0, y: -0.29, z: -0.0000038146973}
+--- !u!114 &3025070677140738270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9013801452791003444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b275e5f92732148048d7b77e264ac30e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ShapeType: 1
+  m_PrimitiveCenter:
+    x: 0
+    y: -0.29
+    z: -0.0000038146973
+  m_PrimitiveSize:
+    x: 0.96
+    y: 0.96
+    z: 5.6
+  m_PrimitiveOrientation:
+    Value:
+      x: -90
+      y: 0
+      z: -90
+    RotationOrder: 4
+  m_Capsule:
+    Height: 5.6
+    Radius: 0.48
+    Axis: 2
+  m_Cylinder:
+    Height: 5.6
+    Radius: 0.48
+    Axis: 2
+  m_CylinderSideCount: 20
+  m_SphereRadius: 2.8
+  m_MinimumSkinnedVertexWeight: 0.1
+  m_ConvexHullGenerationParameters:
+    m_SimplificationTolerance: 0.03
+    m_BevelRadius: 0.05
+    m_MinimumAngle: 2.5000002
+  m_CustomMesh: {fileID: 0}
+  m_ForceUnique: 0
+  m_Material:
+    m_SupportsTemplate: 1
+    m_Template: {fileID: 0}
+    m_CollisionResponse:
+      m_Override: 0
+      m_Value: 3
+    m_Friction:
+      m_Override: 0
+      m_Value:
+        Value: 0.5
+        CombineMode: 0
+    m_Restitution:
+      m_Override: 0
+      m_Value:
+        Value: 0
+        CombineMode: 2
+    m_BelongsToCategories:
+      m_Override: 0
+      m_Value:
+        Category00: 1
+        Category01: 1
+        Category02: 1
+        Category03: 1
+        Category04: 1
+        Category05: 1
+        Category06: 1
+        Category07: 1
+        Category08: 1
+        Category09: 1
+        Category10: 1
+        Category11: 1
+        Category12: 1
+        Category13: 1
+        Category14: 1
+        Category15: 1
+        Category16: 1
+        Category17: 1
+        Category18: 1
+        Category19: 1
+        Category20: 1
+        Category21: 1
+        Category22: 1
+        Category23: 1
+        Category24: 1
+        Category25: 1
+        Category26: 1
+        Category27: 1
+        Category28: 1
+        Category29: 1
+        Category30: 1
+        Category31: 1
+    m_CollidesWithCategories:
+      m_Override: 0
+      m_Value:
+        Category00: 1
+        Category01: 1
+        Category02: 1
+        Category03: 1
+        Category04: 1
+        Category05: 1
+        Category06: 1
+        Category07: 1
+        Category08: 1
+        Category09: 1
+        Category10: 1
+        Category11: 1
+        Category12: 1
+        Category13: 1
+        Category14: 1
+        Category15: 1
+        Category16: 1
+        Category17: 1
+        Category18: 1
+        Category19: 1
+        Category20: 1
+        Category21: 1
+        Category22: 1
+        Category23: 1
+        Category24: 1
+        Category25: 1
+        Category26: 1
+        Category27: 1
+        Category28: 1
+        Category29: 1
+        Category30: 1
+        Category31: 1
+    m_CustomMaterialTags:
+      m_Override: 0
+      m_Value:
+        Tag00: 0
+        Tag01: 0
+        Tag02: 0
+        Tag03: 0
+        Tag04: 0
+        Tag05: 0
+        Tag06: 0
+        Tag07: 0
+    m_SerializedVersion: 1
+  m_SerializedVersion: 1
 --- !u!1 &9091589500080745705
 GameObject:
   m_ObjectHideFlags: 0

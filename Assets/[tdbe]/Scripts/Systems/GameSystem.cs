@@ -8,10 +8,11 @@ using UnityEngine;
 using GameWorld.Asteroid;
 using GameWorld.NPCs;
 using GameWorld.Pickups;
+using GameWorld.Players;
 
 namespace GameWorld
 {
-    [UpdateAfter(typeof(PrefabSpawnerSystem))]
+    [UpdateAfter(typeof(SimpleSpawnerSystem))]
     public partial struct GameSystem : ISystem
     {
         private EntityQuery m_boundsGroup;
@@ -33,22 +34,29 @@ namespace GameWorld
 
         }
 
+        void InitBounds(ref SystemState state, ref EntityCommandBuffer ecb){
+            state.Dependency = new InitBoundsJob
+            {
+                ecb = ecb
+            }.Schedule(m_boundsGroup, state.Dependency);
+            state.Dependency.Complete();
+        }
+
         void SetBounds(ref SystemState state, ref EntityCommandBuffer ecb, bool init)
         {
             if(!m_cameraInitialized || HackyGlobals.WorldBounds._haveChanged){
                 m_cameraInitialized = true;
-                // move the bounds entities in this subscene
 
-                // this is from unity's own 1.0 samples but seems dumb for component changes because it can't use command buffers (existing sync points):
+                // this idiomatic foreach from unity's own 1.0 samples seems bad for component changes because it can't use entity command buffers (existing sync points):
                 // foreach (var (lToW, tagc) in SystemAPI.Query<RefRO<LocalToWorld>, RefRO<BoundsTagComponent>>())
                 // not to mention local to world is no longer the way you change non-uniform scale
 
-                // doing it the ECB way with getEntityQuery
-               var jhandle = new BoundsJob
+                // move the bounds entities in this subscene
+                state.Dependency = new SetBoundsJob
                 {
                     ecb = ecb
                 }.Schedule(m_boundsGroup, state.Dependency);
-                jhandle.Complete();
+                state.Dependency.Complete();
             }
         }
 
@@ -69,12 +77,21 @@ namespace GameWorld
 
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+                InitBounds(ref state, ref ecb);
                 
                 // update variable rate systems states/rates
                 {
-                    var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
-                    var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
-                    asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff);
+                    var entSingleton = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
+                    var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
+                    {
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
+                        var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
+                        asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff);
+                        asteroidSpawner.SetNewRate(ref state);
+                        variRateComp.refreshSystemRateRequest = false;
+                        variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
+                        ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
+                    }
                 }
                 {
                     var entSingleton = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
@@ -85,6 +102,7 @@ namespace GameWorld
                         npcSpawner.SetNewRate(ref state);
                         npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
                         variRateComp.refreshSystemRateRequest = false;
+                        variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
                         ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
                     }
                 }
@@ -97,6 +115,7 @@ namespace GameWorld
                         pickupsSpawner.SetNewRate(ref state);
                         pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
                         variRateComp.refreshSystemRateRequest = false;
+                        variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
                         ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
                     }
                 }
@@ -107,10 +126,6 @@ namespace GameWorld
                     new GameSystemStateComponent{
                         state = GameSystemStateComponent.State.Running
                     });
-
-                ecb = new EntityCommandBuffer(Allocator.TempJob);
-                SetBounds(ref state, ref ecb, true);
-                ecb.Playback(state.EntityManager);
             }
             else if(gameState.state == GameSystemStateComponent.State.Running)
             {
@@ -123,10 +138,11 @@ namespace GameWorld
                     if(variRateComp.refreshSystemRateRequest)
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
-                        var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
-                        pickupsSpawner.SetNewRate(ref state);
-                        pickupsSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
+                        var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
+                        asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
+                        asteroidSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
+                        variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
                         ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
                     }
                 }
@@ -137,9 +153,10 @@ namespace GameWorld
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
                         var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
-                        npcSpawner.SetNewRate(ref state);
                         npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
+                        npcSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
+                        variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
                         ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
                     }
                 }
@@ -150,9 +167,10 @@ namespace GameWorld
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
                         var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
-                        pickupsSpawner.SetNewRate(ref state);
                         pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
+                        pickupsSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
+                        variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
                         ecb.SetComponent<VariableRateComponent>(entSingleton, variRateComp);
                     }
                 }
@@ -160,6 +178,7 @@ namespace GameWorld
                 ecb = new EntityCommandBuffer(Allocator.TempJob);
                 SetBounds(ref state, ref ecb, false);
                 ecb.Playback(state.EntityManager);
+                ecb.Dispose();
             }
             else if(gameState.state == GameSystemStateComponent.State.Ending)
             {
@@ -192,8 +211,21 @@ namespace GameWorld
         }
     }
 
+    public partial struct InitBoundsJob:IJobEntity
+    {
+        public uint globalCount;
+        public EntityCommandBuffer ecb;
+        //[BurstCompile]
+        private void Execute(in Entity bndEnt, in BoundsTagComponent tagC)
+        {
+            ecb.SetComponent<BoundsTagComponent>(bndEnt, new BoundsTagComponent{boundsID = globalCount});
+            globalCount++;
+        }
+    }
+
     //[BurstCompile]
-    public partial struct BoundsJob:IJobEntity
+    // it's ok we don't burst here, window resize is not a realtime feature.
+    public partial struct SetBoundsJob:IJobEntity
     {
         public EntityCommandBuffer ecb;
         //[BurstCompile]

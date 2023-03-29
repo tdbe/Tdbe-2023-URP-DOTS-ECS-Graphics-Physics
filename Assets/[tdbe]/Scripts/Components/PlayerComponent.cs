@@ -4,7 +4,7 @@ namespace GameWorld.Players
 {
     public struct PlayerComponent : IComponentData
     {
-        public double spawnTime;
-        // isCollisionInvulnerable as tag 
+        public float moveSpeed;
+        public float rotateSpeed;
     }
 }

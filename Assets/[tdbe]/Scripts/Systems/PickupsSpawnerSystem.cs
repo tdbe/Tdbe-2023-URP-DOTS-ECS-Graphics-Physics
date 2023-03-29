@@ -20,6 +20,7 @@ namespace GameWorld.Pickups
 
         public void SetRateManager(uint ms, bool pushToWorld){
             RateManager = new RateUtils.VariableRateManager(ms, pushToWorld);
+            RateManager.Timestep = 0.015f;
         }
     }
 
@@ -31,15 +32,12 @@ namespace GameWorld.Pickups
     {
         private EntityQuery m_allPickups;
         private EntityQuery m_boundsGroup;
-        // TODO: this is me screwing around. There has to be a better way, but there are no docs yet.
-        // Maybe IRateManager? No examples, no time to experiment for now.
-        private double lastUpdateRateTime;
 
         // Need to set variable rate from other systems
         public void SetNewRate(ref SystemState state)
         {
             // var ecb = new EntityCommandBuffer(Allocator.Temp);
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             Entity stateCompEnt = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
@@ -47,13 +45,12 @@ namespace GameWorld.Pickups
 
             var asvrUpdateGroup = state.World.GetExistingSystemManaged<PickupsSpawnerVRUpdateGroup>();
             asvrUpdateGroup.SetRateManager(rate, true);
-            lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
         }
 
         public void SetNewState(ref SystemState state, PickupsSpawnerStateComponent.State newState)
         {
             // var ecb = new EntityCommandBuffer(Allocator.Temp);
-            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             
             Entity stateCompEnt = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
@@ -75,6 +72,7 @@ namespace GameWorld.Pickups
 
             // WithAll and WithAny literally don't show up in the unity docs search.
             // Thought they were replaced.
+            // Note: GetComponentLookup
             m_allPickups = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp).WithAny<ShieldPickupTag, GunPickupTag>());
 
             state.RequireForUpdate<BoundsTagComponent>();
@@ -156,18 +154,20 @@ namespace GameWorld.Pickups
             {
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
-                if(SystemAPI.Time.ElapsedTime - lastUpdateRateTime >= rateComponent.burstSpawnRate_ms)
+                
+               if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= rateComponent.burstSpawnRate_ms*0.001f)
                 {
                     //Debug.Log("[PickupsSpawner][InGameSpawn] Pickup! ");
 
-                    var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
-                    var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                     int existingCount = m_allPickups.CalculateEntityCount();
                     SpawnerComponent stateComp = SystemAPI.GetComponent<SpawnerComponent>(stateCompEnt);
-                    
-                    if(existingCount < stateComp.maxNumber){
+                    if(existingCount < stateComp.maxNumber)
+                    {
+                        var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                        var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
 
+                        // we want to slightly randomize the updategroup update rate
                         {
                         var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt);
                         Unity.Mathematics.Random rg = rga.randomGeneratorArr[0];
@@ -181,6 +181,7 @@ namespace GameWorld.Pickups
                         }
                     }
                 }
+ 
             }
         }
     }
