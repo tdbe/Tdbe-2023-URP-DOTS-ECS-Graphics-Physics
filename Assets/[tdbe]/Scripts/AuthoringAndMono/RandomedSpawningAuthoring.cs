@@ -3,12 +3,8 @@ using Unity.Entities;
 
 namespace GameWorld
 {
-    // we could have some sort of inheritance or generics here e.g. across ufo, asteroid, powerup spawning.
-    // but conceptually spealking these are 3 categories of things that normally shouldn't have common links.
-    public class SpawnerAuthoring : MonoBehaviour
+    public class RandomedSpawningAuthoring : MonoBehaviour
     {
-        [Header("Have an upper limit of spawned things.")]
-        public uint maxNumber = 1000; 
         [Header("Maybe play with +- the depth of spawn.")]
         public float zRange = 0;
         [Header("Scale + rand(min, max).")]
@@ -25,12 +21,11 @@ namespace GameWorld
         [Header("Value for an initial impulse force.")]
         public float initialImpulse = 0.05f; 
 
-        public class SpawnerBaker : Baker<SpawnerAuthoring>
+        public class SpawnerBaker : Baker<RandomedSpawningAuthoring>
         {
-            public override void Bake(SpawnerAuthoring authoring)
+            public override void Bake(RandomedSpawningAuthoring authoring)
             {
-                AddComponent<SpawnerComponent>(new SpawnerComponent{
-                    maxNumber = authoring.maxNumber,
+                AddComponent<RandomedSpawningComponent>(new RandomedSpawningComponent{
                     zRange = authoring.zRange,
                     randScaleMin = authoring.randScaleMin,
                     randScaleMax = authoring.randScaleMax,

@@ -7,13 +7,12 @@ using Unity.Physics;
 
 namespace GameWorld
 {
-    public readonly partial struct SpawnerAspect : IAspect
+    public readonly partial struct RandomSpawnedSetupAspect : IAspect
     {
         public readonly Entity entity;
         //private readonly TransformAspect m_transformAspect;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
-        private readonly RefRO<SpawnerComponent> m_spawnerAspectComponent;
-        public uint maxNumber => m_spawnerAspectComponent.ValueRO.maxNumber;
+        private readonly RefRO<RandomedSpawningComponent> m_spawnerAspectComponent;
         public uint initialNumber => m_spawnerAspectComponent.ValueRO.initialNumber;
 
         

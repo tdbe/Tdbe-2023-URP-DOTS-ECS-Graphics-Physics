@@ -3,12 +3,12 @@ using Unity.Entities;
 
 namespace GameWorld.Players
 {
-    public class PlayerSpawnerAuthoring : MonoBehaviour
+    public class PlayerSpawnerTagAuthoring : MonoBehaviour
     {
 
-        public class AsteroidPrefabBaker : Baker<PlayerSpawnerAuthoring>
+        public class AsteroidPrefabBaker : Baker<PlayerSpawnerTagAuthoring>
         {
-            public override void Bake(PlayerSpawnerAuthoring authoring)
+            public override void Bake(PlayerSpawnerTagAuthoring authoring)
             {
                 AddComponent<PlayerSpawnerTag>(new PlayerSpawnerTag{
                 });

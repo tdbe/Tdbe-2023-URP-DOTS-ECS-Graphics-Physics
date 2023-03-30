@@ -48,10 +48,10 @@ namespace GameWorld.Players
                         keyVal = Input.GetKey(plInpComp.Right.keyCode)},
                     Shoot = new PlayerInputComponent.InputPair{
                         keyCode = plInpComp.Shoot.keyCode,
-                        keyVal = Input.GetKey(plInpComp.Shoot.keyCode)},
+                        keyVal = Input.GetKeyUp(plInpComp.Shoot.keyCode)},
                     Teleport = new PlayerInputComponent.InputPair{
                         keyCode = plInpComp.Teleport.keyCode,
-                        keyVal = Input.GetKey(plInpComp.Teleport.keyCode)},
+                        keyVal = Input.GetKeyUp(plInpComp.Teleport.keyCode)},
                 });
             }).Run();
         }

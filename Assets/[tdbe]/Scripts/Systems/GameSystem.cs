@@ -229,7 +229,7 @@ namespace GameWorld
     {
         public EntityCommandBuffer ecb;
         //[BurstCompile]
-        private void Execute(in Entity bndEnt, in LocalTransform lt, in BoundsTagComponent tagC)
+        private void Execute(in Entity bndEnt, in DynamicBuffer<Child> children, in LocalTransform lt, in BoundsTagComponent tagC)
         {
             float3 pos = HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item1;
             pos.z = lt.Position.z;
@@ -244,20 +244,19 @@ namespace GameWorld
             // Hey folks, did you know there isn't any form of ecs collider that can have its size changed at runtime without replacing it with a new and unique (not shared) collider?
             // sonofabitch! what is this, Unreal? :) https://forum.unity.com/threads/to-change-scale-and-collider-radius-in-ecs-physic.722462/#post-8145500
             // well, screw it I just made the shared collider big enough to work in all situations.
-            
+            float3 newScale = HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2;
             PostTransformScale new_pts = new PostTransformScale{
                     Value = float3x3.Scale( // this became quite annoying, although I get why it needs to be post transform
-                        HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2.x,
-                        HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2.y,
-                        HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2.z
+                        newScale
                     )
                 };
-
             ecb.AddComponent<PostTransformScale>(
                 bndEnt,
                 new_pts
                 );
-            
+            ecb.AddComponent<PostTransformScale>(children[0].Value, 
+                new_pts
+            );
         }
     }
 }

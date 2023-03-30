@@ -18,7 +18,10 @@ namespace GameWorld.Players
     [BurstCompile]
     public partial struct  PlayerMovementSystem : ISystem
     {
-        private EntityQuery playersEQG;
+        private EntityQuery m_playersEQG;
+        private EntityQuery m_playerMovelentSysEQG;
+        private EntityQuery m_boundsGroup;
+        
 
         [BurstCompile]
         public void OnCreate(ref SystemState state)
@@ -26,10 +29,18 @@ namespace GameWorld.Players
             // at least one player in the scene
             state.RequireForUpdate<PlayerComponent>();
             state.RequireForUpdate<PlayerInputComponent>();
+            state.RequireForUpdate<PlayerMovementSystemTag>();
+            state.RequireForUpdate<BoundsTagComponent>();
+            state.RequireForUpdate<RandomedSpawningComponent>();
             
-            //state.RequireForUpdate<GameSystem>();
-            
-            playersEQG = state.GetEntityQuery(ComponentType.ReadOnly<PlayerComponent>());
+            m_playersEQG = state.GetEntityQuery(ComponentType.ReadOnly<PlayerComponent>());
+            /*
+            m_playerMovelentSysEQG = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<PlayerMovementSystemTag>()
+                );
+            */
+            m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
+
         }
 
         [BurstCompile]
@@ -37,17 +48,50 @@ namespace GameWorld.Players
         {
         }
 
+        // should have just stored a couple corners entities :)
+        // used for spawn min max
+        [BurstCompile]
+        private void GetCorners2(ref SystemState state, NativeArray<Entity> boundsEnts, out float3 targetAreaBL, out float3 targetAreaTR){
+            float3 bl = float3.zero;
+            float3 tr = float3.zero;
+            foreach(Entity bndEnt in boundsEnts){
+                uint id = SystemAPI.GetComponent<BoundsTagComponent>(bndEnt).boundsID;
+                if(id == 0)
+                    bl.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y+1.01f;
+                else if(id == 1)
+                    bl.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x+1.01f;
+                else if(id == 2)
+                    tr.y = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.y-1.01f;
+                else if(id == 3)
+                    tr.x = SystemAPI.GetComponent<LocalTransform>(bndEnt).Position.x-1.01f;
+            }
+            boundsEnts.Dispose();
+            targetAreaBL = bl;
+            targetAreaTR = tr;
+        }
+
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
             var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+
             state.Dependency = new MovementJob
             {
                 deltaTime = Time.deltaTime,
                 ecbp = ecb.AsParallelWriter(),
-            }.Schedule(playersEQG, state.Dependency);
-            state.CompleteDependency();
+            }.ScheduleParallel(m_playersEQG, state.Dependency);
+
+            float3 targetAreaBL = float3.zero;
+            float3 targetAreaTR = float3.zero;
+            GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
+            
+            state.Dependency = new TeleportJob
+            {
+                ecb = ecb,
+                targetAreaBL = targetAreaBL,
+                targetAreaTR = targetAreaTR
+            }.Schedule(m_playersEQG, state.Dependency);
         }
     }
 
@@ -73,8 +117,31 @@ namespace GameWorld.Players
             
             if(input.Down.keyVal)
                 velocity.ApplyImpulse(mass, ltrans.Position, ltrans.Rotation, -ltrans.Up() * moveSpeed * deltaTime, wtrans.Position);
-               
         }
-        
     }
+
+    [BurstCompile]
+    public partial struct TeleportJob : IJobEntity
+    {
+        public EntityCommandBuffer ecb;
+        [ReadOnly]
+        public float3 targetAreaBL;
+        [ReadOnly]
+        public float3 targetAreaTR;
+
+        public void Execute(in Entity ent, in RandomSpawnedSetupAspect spawnerAspect, in RandomnessSingleThreadedComponent rgc, in PlayerInputComponent plInp)
+        {
+            if(plInp.Teleport.keyVal){
+                Unity.Mathematics.Random rg = rgc.randomGenerator;
+                ecb.SetComponent<LocalTransform>(ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
+                ecb.SetComponent<RandomnessSingleThreadedComponent>(ent, new RandomnessSingleThreadedComponent{
+                    randomGenerator = rg
+                });
+            }
+            
+        }
+    }
+        
+        
+
 }

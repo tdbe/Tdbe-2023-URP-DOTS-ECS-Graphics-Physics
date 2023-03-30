@@ -409,6 +409,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1599235068}
+  - component: {fileID: 1599235070}
   m_Layer: 0
   m_Name: '[PlayerSystemData]'
   m_TagString: Untagged
@@ -431,6 +432,18 @@ Transform:
   m_Father: {fileID: 1753138356}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1599235070
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1599235067}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc64907fd5ecffc45812963d8847646f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1690430213 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4121871349082483645, guid: 06cab492b02005b41be780a5656578b3, type: 3}
@@ -716,10 +729,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1753138356}
     m_Modifications:
-    - target: {fileID: 4759265212075926712, guid: 5a31cb8e73c11044ebd4bf85eb71bbec, type: 3}
-      propertyPath: maxNumber
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 4792037656843308448, guid: 5a31cb8e73c11044ebd4bf85eb71bbec, type: 3}
       propertyPath: parents.Array.data[0]
       value: 

@@ -68,7 +68,7 @@ namespace GameWorld.Pickups
 
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
-            state.RequireForUpdate<SpawnerComponent>();
+            state.RequireForUpdate<RandomedSpawningComponent>();
 
             // WithAll and WithAny literally don't show up in the unity docs search.
             // Thought they were replaced.
@@ -112,7 +112,7 @@ namespace GameWorld.Pickups
         private void DoSpawnOnMap(  ref SystemState state, ref EntityCommandBuffer ecb, ref Entity stateCompEnt, 
                                     PickupsSpawnerStateComponent.State spawnerState, int existingCount)
         {
-            SpawnerAspect spawnerAspect = SystemAPI.GetAspectRW<SpawnerAspect>(stateCompEnt);
+            RandomSpawnedSetupAspect spawnerAspect = SystemAPI.GetAspectRW<RandomSpawnedSetupAspect>(stateCompEnt);
             uint spawnAmount = 0;
             float3 targetAreaBL = float3.zero;
             float3 targetAreaTR = float3.zero;
@@ -155,13 +155,13 @@ namespace GameWorld.Pickups
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
                 
-               if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= rateComponent.burstSpawnRate_ms*0.001f)
+               if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
                 {
                     //Debug.Log("[PickupsSpawner][InGameSpawn] Pickup! ");
 
                     int existingCount = m_allPickups.CalculateEntityCount();
-                    SpawnerComponent stateComp = SystemAPI.GetComponent<SpawnerComponent>(stateCompEnt);
-                    if(existingCount < stateComp.maxNumber)
+                    SpawnCapComponent spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt);
+                    if(existingCount < spawnCap.maxNumber)
                     {
                         var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
@@ -206,12 +206,12 @@ namespace GameWorld.Pickups
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
         [BurstCompile]
-        private void Execute(SpawnerAspect spawnerAspect, PickupsSpawnerStateComponent pssctag)
+        private void Execute(in RandomSpawnedSetupAspect spawnerAspect, in SpawnCapComponent spawnCap, in PickupsSpawnerStateComponent pssctag)
         {
             Unity.Mathematics.Random rg = rga[thri];
             for(uint i = 0; i < spawnAmount; i++){
                 
-                if(i + existingCount >= spawnerAspect.maxNumber){
+                if(i + existingCount >= spawnCap.maxNumber){
                     break;
                 }
                 int which = rg.NextInt(0, prefabsAndParents.Length);

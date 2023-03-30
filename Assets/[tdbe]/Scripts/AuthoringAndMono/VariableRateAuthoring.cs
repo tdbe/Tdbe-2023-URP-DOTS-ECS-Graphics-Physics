@@ -3,8 +3,6 @@ using Unity.Entities;
 
 namespace GameWorld.Pickups
 {
-    // we could have some sort of inheritance or generics here e.g. across Pickups, asteroid, powerup spawning.
-    // but conceptually spealking these are 3 categories of things that normally shouldn't have common links.
     public class VariableRateAuthoring : MonoBehaviour
     {
         public uint burstSpawnRate_ms = 16;// NOTE: Unity.Entities.RateUtils.VariableRateManager.MinUpdateRateMS

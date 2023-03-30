@@ -2,9 +2,8 @@ using Unity.Entities;
 
 namespace GameWorld
 {
-    public struct SpawnerComponent : IComponentData
+    public struct RandomedSpawningComponent : IComponentData
     {
-        public uint maxNumber;
         public float zRange;
         public float randScaleMin;
         public float randScaleMax;

@@ -67,7 +67,7 @@ namespace GameWorld.NPCs
 
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
-            state.RequireForUpdate<SpawnerComponent>();
+            state.RequireForUpdate<RandomedSpawningComponent>();
 
             m_UFOsGroup = state.GetEntityQuery(ComponentType.ReadOnly<UFOComponent>());
 
@@ -108,7 +108,7 @@ namespace GameWorld.NPCs
         private void DoSpawnOnMap(  ref SystemState state, ref EntityCommandBuffer ecb, ref Entity stateCompEnt, 
                                     NPCSpawnerStateComponent.State spawnerState, int existingCount)
         {
-            SpawnerAspect spawnAspect = SystemAPI.GetAspectRW<SpawnerAspect>(stateCompEnt);
+            RandomSpawnedSetupAspect spawnAspect = SystemAPI.GetAspectRW<RandomSpawnedSetupAspect>(stateCompEnt);
             uint spawnAmount = 0;
             float3 targetAreaBL = float3.zero;
             float3 targetAreaTR = float3.zero;
@@ -151,15 +151,15 @@ namespace GameWorld.NPCs
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
                 
-                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= rateComponent.burstSpawnRate_ms*0.001f)
+                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
                 {
                     //Debug.Log("[NPCSpawner][InGameSpawn] UFOe! "+existingUFOCount.ToString());
                     //TODO: I would actually like this mode to spawn UFOs from the edges only
                     
                     int existingCount = m_UFOsGroup.CalculateEntityCount();
-                    SpawnerComponent stateComp = SystemAPI.GetComponent<SpawnerComponent>(stateCompEnt);
+                    SpawnCapComponent spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt);
 
-                    if(existingCount < stateComp.maxNumber)
+                    if(existingCount < spawnCap.maxNumber)
                     {
                         var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
@@ -204,12 +204,12 @@ namespace GameWorld.NPCs
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
         [BurstCompile]
-        private void Execute(SpawnerAspect spawnerAspect, NPCSpawnerStateComponent nssctag)
+        private void Execute(in RandomSpawnedSetupAspect spawnerAspect, in SpawnCapComponent spawnCap, in NPCSpawnerStateComponent nssctag)
         {
             Unity.Mathematics.Random rg = rga[thri];
 
             for(uint i = 0; i < spawnAmount; i++){
-                if(i + existingCount >= spawnerAspect.maxNumber){
+                if(i + existingCount >= spawnCap.maxNumber){
                     break;
                 }
                 
