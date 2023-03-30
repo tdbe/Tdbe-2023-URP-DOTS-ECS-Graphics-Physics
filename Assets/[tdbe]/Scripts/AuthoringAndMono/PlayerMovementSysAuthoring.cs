@@ -3,12 +3,12 @@ using Unity.Entities;
 
 namespace GameWorld.Players
 {
-    public class PlayerMovementAuthoring : MonoBehaviour
+    public class PlayerMovementSysAuthoring : MonoBehaviour
     {
 
-        public class AsteroidPrefabBaker : Baker<PlayerMovementAuthoring>
+        public class AsteroidPrefabBaker : Baker<PlayerMovementSysAuthoring>
         {
-            public override void Bake(PlayerMovementAuthoring authoring)
+            public override void Bake(PlayerMovementSysAuthoring authoring)
             {
                 AddComponent<PlayerMovementSystemTag>(new PlayerMovementSystemTag{
                 });

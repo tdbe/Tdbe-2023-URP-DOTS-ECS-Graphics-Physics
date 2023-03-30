@@ -76,22 +76,17 @@ namespace GameWorld.Players
             var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
+            float3 targetAreaBL = float3.zero;
+            float3 targetAreaTR = float3.zero;
+            GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
+
             state.Dependency = new MovementJob
             {
                 deltaTime = Time.deltaTime,
                 ecbp = ecb.AsParallelWriter(),
-            }.ScheduleParallel(m_playersEQG, state.Dependency);
-
-            float3 targetAreaBL = float3.zero;
-            float3 targetAreaTR = float3.zero;
-            GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
-            
-            state.Dependency = new TeleportJob
-            {
-                ecb = ecb,
                 targetAreaBL = targetAreaBL,
                 targetAreaTR = targetAreaTR
-            }.Schedule(m_playersEQG, state.Dependency);
+            }.ScheduleParallel(m_playersEQG, state.Dependency);
         }
     }
 
@@ -101,8 +96,16 @@ namespace GameWorld.Players
         [ReadOnly]
         public float deltaTime;
         public EntityCommandBuffer.ParallelWriter ecbp;
-
-        public void Execute([ChunkIndexInQuery] int ciqi, in PlayerComponent plComp, ref PhysicsVelocity velocity, in Entity ent, in PlayerInputComponent input, in PhysicsMass mass, in LocalTransform ltrans, in WorldTransform wtrans )
+        [ReadOnly]
+        public float3 targetAreaBL;
+        [ReadOnly]
+        public float3 targetAreaTR;
+        public void Execute([ChunkIndexInQuery] int ciqi, in PlayerComponent plComp, 
+                            ref PhysicsVelocity velocity, in Entity ent, 
+                            in RandomSpawnedSetupAspect spawnerAspect, 
+                            in RandomnessSingleThreadedComponent rgc, 
+                            in PlayerInputComponent input, in PhysicsMass mass, 
+                            in LocalTransform ltrans, in WorldTransform wtrans )
         {
             float rotateSpeed = plComp.rotateSpeed;
             float moveSpeed = plComp.moveSpeed;
@@ -117,31 +120,17 @@ namespace GameWorld.Players
             
             if(input.Down.keyVal)
                 velocity.ApplyImpulse(mass, ltrans.Position, ltrans.Rotation, -ltrans.Up() * moveSpeed * deltaTime, wtrans.Position);
-        }
-    }
-
-    [BurstCompile]
-    public partial struct TeleportJob : IJobEntity
-    {
-        public EntityCommandBuffer ecb;
-        [ReadOnly]
-        public float3 targetAreaBL;
-        [ReadOnly]
-        public float3 targetAreaTR;
-
-        public void Execute(in Entity ent, in RandomSpawnedSetupAspect spawnerAspect, in RandomnessSingleThreadedComponent rgc, in PlayerInputComponent plInp)
-        {
-            if(plInp.Teleport.keyVal){
+        
+            // teleport / hyperspace
+            if(input.Teleport.keyVal){
                 Unity.Mathematics.Random rg = rgc.randomGenerator;
-                ecb.SetComponent<LocalTransform>(ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
-                ecb.SetComponent<RandomnessSingleThreadedComponent>(ent, new RandomnessSingleThreadedComponent{
+                ecbp.SetComponent<LocalTransform>(ciqi, ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
+                ecbp.SetComponent<RandomnessSingleThreadedComponent>(ciqi, ent, new RandomnessSingleThreadedComponent{
                     randomGenerator = rg
                 });
             }
-            
         }
+
     }
-        
-        
 
 }
