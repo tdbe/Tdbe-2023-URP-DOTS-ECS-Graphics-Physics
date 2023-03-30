@@ -415,7 +415,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4402269492024556219}
   m_Layer: 23
-  m_Name: Gun_pickup_onPlayer
+  m_Name: SpecialProjectile_pickup_ownerVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -819,7 +819,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8118419773585248086}
   m_Layer: 23
-  m_Name: Shield_pickup_onPlayer
+  m_Name: Shield_pickup_ownerVisual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

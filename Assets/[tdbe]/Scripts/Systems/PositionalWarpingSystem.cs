@@ -39,7 +39,7 @@ namespace GameWorld
         public void OnUpdate(ref SystemState state)
         {
             // EndSimulationEntityCommandBufferSystem
-            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             m_boundsTCL.Update(ref state);
             m_warpableTCL.Update(ref state);
@@ -53,7 +53,7 @@ namespace GameWorld
                 localTransformComponent = m_ltransTCL
             };
             state.Dependency = jhandle.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
-            // X_X singlethreaded physics
+            // X_X singlethreaded physics lookups
         }
 
     }

@@ -5,8 +5,7 @@ namespace GameWorld.Projectiles
     public struct ProjectileComponent : IComponentData
     {
         public Entity owner;
-        public double spawnTime;
         public float timeToLive;
-        // isCollisionInvulnerable as tag
+        //isCollisionInvulnerable -- this manifests as a tag
     }
 }

@@ -1438,10 +1438,11 @@ GameObject:
   - component: {fileID: 737154632322764960}
   - component: {fileID: 4178619947887153333}
   - component: {fileID: 654603664549717999}
-  - component: {fileID: 8805914970066724491}
   - component: {fileID: 3938630759052820929}
+  - component: {fileID: 8279701008329298171}
+  - component: {fileID: 1233530273288258581}
   m_Layer: 23
-  m_Name: Gun_pickup
+  m_Name: SpecialProjectile_pickup
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1567,19 +1568,6 @@ MonoBehaviour:
     x: 1
     y: 0
     z: 1
---- !u!114 &8805914970066724491
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4377867094261573720}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f329a2bb9c2ba404badb7f9e0db5ea13, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerGunPrefab: {fileID: 4107237136837000114, guid: 505284f62c6026f418f53422f2c8b1a2, type: 3}
 --- !u!114 &3938630759052820929
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1593,6 +1581,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   warpImmunityPeriod: 0.5
+--- !u!114 &8279701008329298171
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4377867094261573720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff421ca84f3e8f24f919f3bdd76aae7b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1233530273288258581
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4377867094261573720}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 261047fabe1672e49a4d32e404c18366, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  activeVisual: {fileID: 4107237136837000114, guid: 505284f62c6026f418f53422f2c8b1a2, type: 3}
+  prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+  timeToLive: 2000
+  isCollisionInvulnerable: 1
 --- !u!1 &4468848779926832170
 GameObject:
   m_ObjectHideFlags: 0

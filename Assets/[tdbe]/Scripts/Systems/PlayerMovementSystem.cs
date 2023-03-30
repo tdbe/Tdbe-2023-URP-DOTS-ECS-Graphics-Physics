@@ -29,18 +29,12 @@ namespace GameWorld.Players
             // at least one player in the scene
             state.RequireForUpdate<PlayerComponent>();
             state.RequireForUpdate<PlayerInputComponent>();
-            state.RequireForUpdate<PlayerMovementSystemTag>();
+            //state.RequireForUpdate<PlayerMovementSystemTag>();
             state.RequireForUpdate<BoundsTagComponent>();
             state.RequireForUpdate<RandomedSpawningComponent>();
             
             m_playersEQG = state.GetEntityQuery(ComponentType.ReadOnly<PlayerComponent>());
-            /*
-            m_playerMovelentSysEQG = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp)
-                .WithAll<PlayerMovementSystemTag>()
-                );
-            */
             m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
-
         }
 
         [BurstCompile]

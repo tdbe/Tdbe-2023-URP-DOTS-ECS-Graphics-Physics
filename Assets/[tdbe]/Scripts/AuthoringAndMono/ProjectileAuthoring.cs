@@ -5,17 +5,17 @@ namespace GameWorld.Projectiles
 {
     public class ProjectileAuthoring : MonoBehaviour
     {
+        [HideInInspector]
         public GameObject owner;
-        public double spawnTime;
-        public float timeToLive;
-        public class ProjectileBaker : Baker<ProjectileAuthoring>
+        [HideInInspector]
+        public float timeToLive = 2000;
+        public class Projectileaker : Baker<ProjectileAuthoring>
         {
             public override void Bake(ProjectileAuthoring authoring)
             {
                 AddComponent<ProjectileComponent>(new ProjectileComponent{
-                   owner = GetEntity(authoring.owner),
-                   spawnTime = authoring.spawnTime,
-                   timeToLive = authoring.timeToLive
+                    owner = GetEntity(authoring.owner),
+                    timeToLive = authoring.timeToLive
                 });
             }
         }

@@ -25,8 +25,6 @@ namespace GameWorld.Asteroid
         }
     }
 
-    // TODO: should try organizing in some writegroups and jobs and/or some externals here e.g. across ufo, asteroid, powerup spawning.
-    // But also, conceptually spealking, in general gamedev, these are 3 categories of things that normally shouldn't have common links.
     [UpdateInGroup(typeof(AsteroidSpawnerVRUpdateGroup))]
     [BurstCompile]
     public partial struct AsteroidSpawnerSystem : ISystem

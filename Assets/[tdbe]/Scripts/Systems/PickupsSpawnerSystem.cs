@@ -24,8 +24,6 @@ namespace GameWorld.Pickups
         }
     }
 
-    // TODO: should try organizing in some writegroups and jobs and/or some externals here e.g. across Pickups, asteroid, powerup spawning.
-    // But also, conceptually spealking, in general gamedev, these are 3 categories of things that normally shouldn't have common links.
     [UpdateInGroup(typeof(PickupsSpawnerVRUpdateGroup))]
     [BurstCompile]
     public partial struct PickupsSpawnerSystem : ISystem
@@ -70,10 +68,9 @@ namespace GameWorld.Pickups
             state.RequireForUpdate<RandomnessComponent>();
             state.RequireForUpdate<RandomedSpawningComponent>();
 
-            // WithAll and WithAny literally don't show up in the unity docs search.
-            // Thought they were replaced.
-            // Note: GetComponentLookup
-            m_allPickups = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp).WithAny<ShieldPickupTag, GunPickupTag>());
+            // GetComponentLookup
+            //m_allPickups = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp).WithAny<ShieldPickupTag, GunPickupTag>());
+            m_allPickups = state.GetEntityQuery(ComponentType.ReadOnly<PickupTag>());
 
             state.RequireForUpdate<BoundsTagComponent>();
             m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
