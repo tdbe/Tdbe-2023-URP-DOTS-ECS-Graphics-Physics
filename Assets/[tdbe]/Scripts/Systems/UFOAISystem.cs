@@ -4,22 +4,37 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Mathematics;
 using UnityEngine;
+using Unity.Physics;
+using Unity.Physics.Systems;
+
+
+using GameWorld.Players;
+using GameWorld.NPCs;
 
 namespace GameWorld.NPCs
 {
+    // This system runs for each UFO, and finds the closest player, 
+    // and if within chaseRange, moves the ufo toward the player, 
+    // also accounting for shortest distance vs distance via portals.
     [UpdateAfter(typeof(GameSystem))]
     public partial struct UFOAISystem : ISystem
     {
-        private EntityQuery m_boundsGroup;
+        private EntityQuery m_playersEQG;
+        private EntityQuery m_UFOsEQG;
+        //private EntityQuery m_boundsGroup;
         private bool m_cameraInitialized;
 
  
         public void OnCreate(ref SystemState state)
         {
 
+            state.RequireForUpdate<PlayerComponent>();
+            state.RequireForUpdate<UFOComponent>();
             state.RequireForUpdate<BoundsTagComponent>();
 
-            m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
+            m_playersEQG = state.GetEntityQuery(ComponentType.ReadOnly<PlayerComponent>());
+            m_UFOsEQG = state.GetEntityQuery(ComponentType.ReadOnly<UFOComponent>());
+            //m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
         }
 
         public void OnDestroy(ref SystemState state)
@@ -30,46 +45,113 @@ namespace GameWorld.NPCs
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // TODO: range + patrol + chase?
+            // TODO: patrol state?
 
+
+            // The smart thing to do here would be to have a job that takes all players
+            // and inserts them into some kind of partitioning tree or hash map.
+            // Then in the ufo move job, fetch the closest player to the ufo's position.
+
+            // But since we have portals, and I don't have time,
+            // I'll just quickly calculate portal-aware distances from each ufo to all players.
+            // This is fine because we have few players.
+
+            int i = 0;
+            NativeArray<float3> playerPosArr = new NativeArray<float3>(m_playersEQG.CalculateEntityCount(), Allocator.TempJob);
+            foreach (var lToW in SystemAPI.Query<RefRO<LocalToWorld>>().WithAll<PlayerComponent>())
+            {
+                playerPosArr[i] = lToW.ValueRO.Position;
+                i++;
+            }
+
+            var ecbSingleton = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            PhysicsWorld physWorld = SystemAPI.GetSingleton<PhysicsWorldSingleton>().PhysicsWorld;
+
+            state.Dependency = new UFOChaseJob
+            {
+                deltaTime = Time.deltaTime,
+                ecbp = ecb.AsParallelWriter(),
+                playerPosArr = playerPosArr,
+                physWorld = physWorld
+            }.ScheduleParallel(m_UFOsEQG, state.Dependency);
         }
     }
 
     [BurstCompile]
     public partial struct UFOChaseJob:IJobEntity
     {
-        public EntityCommandBuffer ecb;
-        [BurstCompile]
-        private void Execute(in Entity bndEnt, in LocalTransform lt, in BoundsTagComponent tagC)
-        {
-            /*
-            float3 pos = HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item1;
-            pos.z = lt.Position.z;
-            
-            ecb.SetComponent<LocalTransform>(
-                bndEnt,
-                new LocalTransform{
-                        Position = HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item1,
-                        Rotation = quaternion.RotateZ(-1.570796f * tagC.boundsID),
-                        Scale = 1
-                });
-            // Hey folks, did you know there isn't any form of ecs collider that can have its size changed at runtime without replacing it with a new and unique (not shared) collider?
-            // sonofabitch! what is this, Unreal? :) https://forum.unity.com/threads/to-change-scale-and-collider-radius-in-ecs-physic.722462/#post-8145500
-            // well, screw it I just made the shared collider big enough to work in all situations.
-            
-            PostTransformScale new_pts = new PostTransformScale{
-                    Value = float3x3.Scale( // this became quite annoying, although I get why it needs to be post transform
-                        HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2.x,
-                        HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2.y,
-                        HackyGlobals.WorldBounds._boundsPosAndScaleArrayBottomClockwise[tagC.boundsID].Item2.z
-                    )
-                };
+        [ReadOnly]
+        public float deltaTime;
+        public EntityCommandBuffer.ParallelWriter ecbp;
+        [ReadOnly]
+        public NativeArray<float3> playerPosArr;
+        [ReadOnly]
+        public PhysicsWorld physWorld;
 
-            ecb.AddComponent<PostTransformScale>(
-                bndEnt,
-                new_pts
-                );*/
-            
+        enum layer
+        {
+            // TODO: but really would be nice to actually access the Layers defined in settings.
+            WorldBounds = (1 << 9)
+        };
+
+        [BurstCompile]
+        private void Execute([ChunkIndexInQuery] int ciqi, in LocalToWorld ufoLtoW, in LocalTransform ufoLtrans, in UFOComponent ufoC, in Entity ufoEnt)
+        {
+            float least_sqDistEucliOrPortal = float.MaxValue;
+            float3 target_forLeastDist = ufoLtrans.Position;
+            // for now we don't care about any further knowledge than just, closest distance one or another.
+            foreach(float3 playerPos in playerPosArr)
+            {
+                float sqDistEuclid = math.distancesq(playerPos, ufoLtoW.Position);
+                if(least_sqDistEucliOrPortal > sqDistEuclid)
+                {
+                    least_sqDistEucliOrPortal = sqDistEuclid;
+                    target_forLeastDist = playerPos;
+                }
+                
+                float sqDistPortal = float.MaxValue;
+                float3 dirToPlayer = math.normalize(playerPos - ufoLtoW.Position);
+                RaycastInput raycastInput = new RaycastInput()
+                {
+                    Start = ufoLtoW.Position,
+                    End = -dirToPlayer * 100,
+                    Filter = new CollisionFilter
+                    {
+                        BelongsTo = (uint)layer.WorldBounds,
+                        CollidesWith = (uint)layer.WorldBounds,
+                        GroupIndex = 0
+                    }
+                };
+                if (physWorld.CastRay(raycastInput, out Unity.Physics.RaycastHit hit))
+                {
+                    float3 posOnBound = hit.Position;
+                    float sqDistToBound = math.distancesq(posOnBound, ufoLtoW.Position);
+                    float sqDistBoundToPlayer = math.distancesq(-posOnBound, playerPos);
+                    sqDistPortal = sqDistToBound + sqDistBoundToPlayer;
+                    if(least_sqDistEucliOrPortal > sqDistPortal)
+                    {
+                        least_sqDistEucliOrPortal = sqDistPortal;
+                        // we heading to bound not to player
+                        target_forLeastDist = posOnBound;
+                    }
+                }
+            } 
+
+            // move towards player
+            {
+                float totalDist = math.sqrt(least_sqDistEucliOrPortal);
+                if(totalDist <= ufoC.maxChaseDist)
+                {
+                    var newLtrans = new LocalTransform{
+                        Position = ufoLtrans.Position,
+                        Rotation = ufoLtrans.Rotation,
+                        Scale = ufoLtrans.Scale
+                    };
+                    newLtrans.Position += deltaTime * ufoC.moveSpeed * math.normalize(target_forLeastDist - ufoLtoW.Position);
+                    ecbp.SetComponent<LocalTransform>(ciqi, ufoEnt, newLtrans);
+                }
+            }
         }
     }
 }
