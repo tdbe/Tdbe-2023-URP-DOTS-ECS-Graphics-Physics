@@ -16,6 +16,7 @@ namespace GameWorld.NPCs
     // This system runs for each UFO, and finds the closest player, 
     // and if within chaseRange, moves the ufo toward the player, 
     // also accounting for shortest distance vs distance via portals.
+    // Otherwise the ufo patrols horizontally.
     [UpdateAfter(typeof(GameSystem))]
     public partial struct UFOAISystem : ISystem
     {
@@ -45,8 +46,6 @@ namespace GameWorld.NPCs
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            // TODO: patrol state?
-
 
             // The smart thing to do here would be to have a job that takes all players
             // and inserts them into some kind of partitioning tree or hash map.
@@ -149,6 +148,15 @@ namespace GameWorld.NPCs
                         Scale = ufoLtrans.Scale
                     };
                     newLtrans.Position += deltaTime * ufoC.moveSpeed * math.normalize(target_forLeastDist - ufoLtoW.Position);
+                    ecbp.SetComponent<LocalTransform>(ciqi, ufoEnt, newLtrans);
+                }
+                else{// "patrol state"
+                    var newLtrans = new LocalTransform{
+                        Position = ufoLtrans.Position,
+                        Rotation = ufoLtrans.Rotation,
+                        Scale = ufoLtrans.Scale
+                    };
+                    newLtrans.Position += deltaTime * ufoC.moveSpeed * newLtrans.Right();
                     ecbp.SetComponent<LocalTransform>(ciqi, ufoEnt, newLtrans);
                 }
             }
