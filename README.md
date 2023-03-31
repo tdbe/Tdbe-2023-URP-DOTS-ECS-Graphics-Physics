@@ -7,6 +7,7 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 
 WIP. So far done:
 - game system, states, spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups, ufos+ai...
+
 TODO:
 - shooting and dying
 
