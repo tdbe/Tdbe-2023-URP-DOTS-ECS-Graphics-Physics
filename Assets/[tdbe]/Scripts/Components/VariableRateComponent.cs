@@ -14,6 +14,6 @@ namespace GameWorld
         // you automatically trigger an -instant- OnUpdate for that group. gg
         // https://forum.unity.com/search/23815189/?q=iratemanager&o=date&c[node]=823+147+641+422+425
         public bool refreshSystemRateRequest;
-        public double lastUpdateRateTime;
+        public double lastUpdateRateTime;// in seconds
     }
 }

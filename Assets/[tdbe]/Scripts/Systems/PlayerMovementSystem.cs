@@ -12,7 +12,7 @@ namespace GameWorld.Players
 {
     
     //[UpdateAfter(typeof(GameSystem))]
-    [UpdateAfter(typeof(PlayerInputUpdateSystemBase))]
+    //[UpdateAfter(typeof(PlayerInputUpdateSystemBase))]
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateBefore(typeof(PhysicsSystemGroup))]
     [BurstCompile]

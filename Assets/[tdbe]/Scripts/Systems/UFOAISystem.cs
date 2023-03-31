@@ -109,30 +109,33 @@ namespace GameWorld.NPCs
                     target_forLeastDist = playerPos;
                 }
                 
-                float sqDistPortal = float.MaxValue;
-                float3 dirToPlayer = math.normalize(playerPos - ufoLtoW.Position);
-                RaycastInput raycastInput = new RaycastInput()
+                if(sqDistEuclid>ufoC.minChaseDist)
                 {
-                    Start = ufoLtoW.Position,
-                    End = -dirToPlayer * 100,
-                    Filter = new CollisionFilter
+                    float sqDistPortal = float.MaxValue;
+                    float3 dirToPlayer = math.normalize(playerPos - ufoLtoW.Position);
+                    RaycastInput raycastInput = new RaycastInput()
                     {
-                        BelongsTo = (uint)layer.WorldBounds,
-                        CollidesWith = (uint)layer.WorldBounds,
-                        GroupIndex = 0
-                    }
-                };
-                if (physWorld.CastRay(raycastInput, out Unity.Physics.RaycastHit hit))
-                {
-                    float3 posOnBound = hit.Position;
-                    float sqDistToBound = math.distancesq(posOnBound, ufoLtoW.Position);
-                    float sqDistBoundToPlayer = math.distancesq(-posOnBound, playerPos);
-                    sqDistPortal = sqDistToBound + sqDistBoundToPlayer;
-                    if(least_sqDistEucliOrPortal > sqDistPortal)
+                        Start = ufoLtoW.Position,
+                        End = -dirToPlayer * 100,
+                        Filter = new CollisionFilter
+                        {
+                            BelongsTo = (uint)layer.WorldBounds,
+                            CollidesWith = (uint)layer.WorldBounds,
+                            GroupIndex = 0
+                        }
+                    };
+                    if (physWorld.CastRay(raycastInput, out Unity.Physics.RaycastHit hit))
                     {
-                        least_sqDistEucliOrPortal = sqDistPortal;
-                        // we heading to bound not to player
-                        target_forLeastDist = posOnBound;
+                        float3 posOnBound = hit.Position;
+                        float sqDistToBound = math.distancesq(posOnBound, ufoLtoW.Position);
+                        float sqDistBoundToPlayer = math.distancesq(-posOnBound, playerPos);
+                        sqDistPortal = sqDistToBound + sqDistBoundToPlayer;
+                        if(least_sqDistEucliOrPortal > sqDistPortal)
+                        {
+                            least_sqDistEucliOrPortal = sqDistPortal;
+                            // we heading to bound not to player
+                            target_forLeastDist = posOnBound;
+                        }
                     }
                 }
             } 
@@ -140,7 +143,7 @@ namespace GameWorld.NPCs
             // move towards player
             {
                 float totalDist = math.sqrt(least_sqDistEucliOrPortal);
-                if(totalDist <= ufoC.maxChaseDist)
+                if(totalDist <= ufoC.maxChaseDist && totalDist >= ufoC.minChaseDist)
                 {
                     var newLtrans = new LocalTransform{
                         Position = ufoLtrans.Position,

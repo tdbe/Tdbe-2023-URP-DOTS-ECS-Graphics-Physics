@@ -7,5 +7,6 @@ namespace GameWorld.NPCs
         public float moveSpeed;
         public float rotateSpeed;
         public float maxChaseDist;
+        public float minChaseDist;
     }
 }

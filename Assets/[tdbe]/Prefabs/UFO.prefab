@@ -226,8 +226,8 @@ Rigidbody:
   m_GameObject: {fileID: 1998748012411953420}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0
+  m_Drag: 0.2
+  m_AngularDrag: 0.2
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -242,7 +242,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 8
+  m_Constraints: 120
   m_CollisionDetection: 0
 --- !u!114 &2197973098822425057
 MonoBehaviour:
@@ -259,8 +259,8 @@ MonoBehaviour:
   m_MotionType: 0
   m_Smoothing: 0
   m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0
+  m_LinearDamping: 0.2
+  m_AngularDamping: 0.2
   m_InitialLinearVelocity:
     x: 0
     y: 0
@@ -310,9 +310,9 @@ MonoBehaviour:
   ConnectedBody: {fileID: 0}
   EnableCollision: 0
   MaxImpulse:
-    x: Infinity
-    y: Infinity
-    z: Infinity
+    x: 0.5
+    y: 0.5
+    z: 0.5
   LockLinearAxes:
     x: 0
     y: 0
@@ -336,6 +336,7 @@ MonoBehaviour:
   moveSpeed: 1
   rotateSpeed: 0
   maxChaseDist: 6
+  minChaseDist: 0.1
 --- !u!114 &3655462724148777929
 MonoBehaviour:
   m_ObjectHideFlags: 0
