@@ -6,7 +6,7 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 .'s 1.0 sandbox
 
 WIP. So far done:
-- player, game system, states, spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups, ufos+ai...
+- player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups, rocks, ufos+ai...
 
 TODO:
 - shooting and dying
