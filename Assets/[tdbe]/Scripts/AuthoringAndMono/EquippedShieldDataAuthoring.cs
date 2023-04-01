@@ -7,8 +7,10 @@ namespace GameWorld.Pickups
     {
         [Header("This is the shield data that gets read by the system.")]
         public bool active = false;
+        [Header("e.g. player.")]
         public GameObject owner;
-        public GameObject activeVisual;
+        [Header("Spawned active visual on owner, e.g. gun.")]
+        public GameObject spawnedVisual;
         public float timeToLive = 2000;
         
         public class EquippedShieldDataBaker : Baker<EquippedShieldDataAuthoring>
@@ -18,7 +20,7 @@ namespace GameWorld.Pickups
                 AddComponent<EquippedShieldDataComponent>(new EquippedShieldDataComponent{
                     active = authoring.active,
                     owner = GetEntity(authoring.owner),
-                    activeVisual = GetEntity(authoring.activeVisual),
+                    spawnedVisual = GetEntity(authoring.spawnedVisual),
                     timeToLive = authoring.timeToLive
                 });
             }

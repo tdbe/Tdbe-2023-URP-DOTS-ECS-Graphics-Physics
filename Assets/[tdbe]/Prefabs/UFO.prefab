@@ -308,7 +308,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ConnectedBody: {fileID: 0}
-  EnableCollision: 0
+  EnableCollision: 1
   MaxImpulse:
     x: 0.5
     y: 0.5
@@ -335,7 +335,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 1
   rotateSpeed: 0
-  maxChaseDist: 6
+  maxChaseDist: 5.5
   minChaseDist: 0.1
 --- !u!114 &3655462724148777929
 MonoBehaviour:

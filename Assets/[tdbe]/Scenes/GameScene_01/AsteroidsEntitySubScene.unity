@@ -1045,6 +1045,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: '[SimpleSpawnerData-OneShield]'
       objectReference: {fileID: 0}
+    - target: {fileID: 7999428019584590159, guid: ffd64ed0c975965408c316e613b2f56f, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

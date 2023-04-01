@@ -922,8 +922,8 @@ GameObject:
   - component: {fileID: -4586719085642723876}
   - component: {fileID: 6327725319107188102}
   - component: {fileID: 7394668203450522924}
-  - component: {fileID: -8852127702617716055}
   - component: {fileID: 4644322724490792291}
+  - component: {fileID: -8852127702617716055}
   - component: {fileID: 5288423428541713879}
   m_Layer: 20
   m_Name: Player
@@ -1129,6 +1129,23 @@ MonoBehaviour:
   Right: 275
   Shoot: 305
   Teleport: 303
+--- !u!114 &4644322724490792291
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7215400412842331241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 261047fabe1672e49a4d32e404c18366, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  active: 1
+  activeVisual: {fileID: 0}
+  prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+  timeToLive: 2000
+  isCollisionInvulnerable: 0
 --- !u!114 &-8852127702617716055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1144,22 +1161,6 @@ MonoBehaviour:
   active: 1
   owner: {fileID: 7215400412842331241}
   activeVisual: {fileID: 0}
-  prefab: {fileID: 0}
-  timeToLive: 2000
-  isCollisionInvulnerable: 0
---- !u!114 &4644322724490792291
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7215400412842331241}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 261047fabe1672e49a4d32e404c18366, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  activeVisual: {fileID: 4107237136837000114, guid: 14934bc84db4ec84b9084626cc10eeea, type: 3}
   prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
   timeToLive: 2000
   isCollisionInvulnerable: 0

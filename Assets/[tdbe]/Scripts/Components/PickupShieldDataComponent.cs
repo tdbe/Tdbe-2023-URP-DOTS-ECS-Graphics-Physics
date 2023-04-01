@@ -6,6 +6,7 @@ namespace GameWorld.Pickups
     [WriteGroup(typeof(EquippedShieldDataComponent))]
     public struct PickupShieldDataComponent : IComponentData
     {
+        public bool active;
         public Entity activeVisual;
         public float timeToLive;
     }

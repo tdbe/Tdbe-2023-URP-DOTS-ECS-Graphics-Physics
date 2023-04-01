@@ -6,7 +6,7 @@ namespace GameWorld.Pickups
     {
         public bool active;
         public Entity owner;
-        public Entity activeVisual;
+        public Entity spawnedVisual;
         public Entity prefab;
         public float timeToLive;
         public bool isCollisionInvulnerable;

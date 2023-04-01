@@ -180,15 +180,14 @@ namespace GameWorld.Asteroid
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
                 
-                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
+                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime > math.max(Time.deltaTime, 0.066f))
                 {
-                    Debug.Log("[AsteroidSpawner][InitialSpawn] spawning. ");
-
                     int existingCount = m_asteroidsGroup.CalculateEntityCount();
                     SpawnCapComponent spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt);
                     
                     if(existingCount < spawnCap.maxNumber)
                     {
+                        Debug.Log("[AsteroidSpawner][InitialSpawn] spawning. ");
                         var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
@@ -208,7 +207,7 @@ namespace GameWorld.Asteroid
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
                 
-                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
+                if(!rateComponent.refreshSystemRateRequest)
                 {
                     int existingCount = m_asteroidsGroup.CalculateEntityCount();
                     var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
@@ -222,7 +221,7 @@ namespace GameWorld.Asteroid
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
                 
-                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
+                if(!rateComponent.refreshSystemRateRequest)
                 {
                     var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                     var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);

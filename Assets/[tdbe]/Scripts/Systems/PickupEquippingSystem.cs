@@ -47,8 +47,8 @@ namespace GameWorld.Pickups
             m_playersTCL = state.GetComponentLookup<PlayerComponent>(true);
             m_pickupTCL = state.GetComponentLookup<PickupTag>(true);
 
-            m_equipProjectileTCL = state.GetComponentLookup<EquippedProjectileDataComponent>(false);
-            m_equipShieldTCL = state.GetComponentLookup<EquippedShieldDataComponent>(false);
+            m_equipProjectileTCL = state.GetComponentLookup<EquippedProjectileDataComponent>(true);
+            m_equipShieldTCL = state.GetComponentLookup<EquippedShieldDataComponent>(true);
             m_pickupProjectileTCL = state.GetComponentLookup<PickupProjectileDataComponent>(false);
             m_pickupShieldTCL = state.GetComponentLookup<PickupShieldDataComponent>(false);
 
@@ -108,9 +108,9 @@ namespace GameWorld.Pickups
         public ComponentLookup<EquippedProjectileDataComponent> equipProjectileTCL;
         [ReadOnly]
         public ComponentLookup<EquippedShieldDataComponent> equipShieldTCL;
-        [ReadOnly]
+        
         public ComponentLookup<PickupProjectileDataComponent> pickupProjectileTCL;
-        [ReadOnly]
+        
         public ComponentLookup<PickupShieldDataComponent> pickupShieldTCL;
 
         [BurstCompile]
@@ -136,19 +136,44 @@ namespace GameWorld.Pickups
                 Entity equipProjectileEnt,
                 PickupProjectileDataComponent pickupProjectileComp,
                 Entity pickupProjectileEnt,
-                EntityCommandBuffer ecb
+                EntityCommandBuffer ecb,
+                ref ComponentLookup<PickupProjectileDataComponent> pickupProjectileTCL
             ){
+                if(!pickupProjectileComp.active)
+                    return;
                 equipProjectileComp.active = true;
                 equipProjectileComp.isCollisionInvulnerable = pickupProjectileComp.isCollisionInvulnerable;
                 equipProjectileComp.timeToLive = pickupProjectileComp.timeToLive;
                 equipProjectileComp.owner = equipProjectileEnt;
                 equipProjectileComp.prefab = pickupProjectileComp.prefab;
-                equipProjectileComp.activeVisual = pickupProjectileComp.activeVisual;
+
+                {
+                    if(equipProjectileComp.spawnedVisual != Entity.Null)
+                        ecb.DestroyEntity(equipProjectileComp.spawnedVisual);
+
+                    if(pickupProjectileComp.activeVisual != Entity.Null)
+                    {
+                        Entity prefabInstance = ecb.Instantiate(pickupProjectileComp.activeVisual);
+                        // Adding a component that already exists on an entity through the command buffer should result in just setting the value
+                        // Otherwise we can also add a requirement in baking.
+                        ecb.AddComponent<Parent>(prefabInstance, new Parent{
+                            Value = equipProjectileEnt
+                        });
+                        equipProjectileComp.spawnedVisual = prefabInstance;
+                    }
+                }
+                
                 ecb.SetComponent<EquippedProjectileDataComponent>(
                     equipProjectileEnt,
                     equipProjectileComp
                 );
                 ecb.DestroyEntity(pickupProjectileEnt);
+
+                // it's very important to avoid duplicates now that we instantiate and whatnot..
+                // so we set this component here immediately (no ecb) and check for it in the beginning of this function.
+                var comp = pickupProjectileTCL[pickupProjectileEnt];
+                comp.active = false;
+                pickupProjectileTCL[pickupProjectileEnt] = comp;
             }
 
             void setShield(
@@ -156,17 +181,42 @@ namespace GameWorld.Pickups
                 Entity equipShieldEnt,
                 PickupShieldDataComponent pickupShieldComp,
                 Entity pickupShieldEnt,
-                EntityCommandBuffer ecb
+                EntityCommandBuffer ecb,
+                ref ComponentLookup<PickupShieldDataComponent> pickupShieldTCL
             ){
+                if(!pickupShieldComp.active)
+                    return;
                 equipShieldComp.active = true;
                 equipShieldComp.timeToLive = pickupShieldComp.timeToLive;
                 equipShieldComp.owner = equipShieldEnt;
-                equipShieldComp.activeVisual = pickupShieldComp.activeVisual;
+
+                {
+                    if(equipShieldComp.spawnedVisual != Entity.Null)
+                        ecb.DestroyEntity(equipShieldComp.spawnedVisual);
+
+                    if(pickupShieldComp.activeVisual != Entity.Null)
+                    {
+                        Entity prefabInstance = ecb.Instantiate(pickupShieldComp.activeVisual);
+                        // Adding a component that already exists on an entity through the command buffer should result in just setting the value
+                        // Otherwise we can also add a requirement in baking.
+                        ecb.AddComponent<Parent>(prefabInstance, new Parent{
+                            Value = equipShieldEnt
+                        });
+                        equipShieldComp.spawnedVisual = prefabInstance;
+                    }
+                }
+
                 ecb.SetComponent<EquippedShieldDataComponent>(
                     equipShieldEnt,
                     equipShieldComp
                 );
                 ecb.DestroyEntity(pickupShieldEnt);
+
+                // it's very important to avoid duplicates now that we instantiate and whatnot..
+                // so we set this component here immediately (no ecb) and check for it in the beginning of this function.
+                var comp = pickupShieldTCL[pickupShieldEnt];
+                comp.active = false;
+                pickupShieldTCL[pickupShieldEnt] = comp;
             }
 
             if(isEquiperA && isPickupB){
@@ -181,7 +231,8 @@ namespace GameWorld.Pickups
                     PickupProjectileDataComponent pickupProjectileComp;
                     pickupProjectileTCL.TryGetComponent(entB, out pickupProjectileComp);
 
-                    setProjectile(equipProjectileComp, equipProjectileEnt, pickupProjectileComp, pickupProjectileEnt, ecb);
+                    setProjectile(equipProjectileComp, equipProjectileEnt, pickupProjectileComp, 
+                                    pickupProjectileEnt, ecb, ref pickupProjectileTCL);
                 }
                 else if(equipShieldTCL.HasComponent(entA) &&
                         pickupShieldTCL.HasComponent(entB) )
@@ -194,7 +245,8 @@ namespace GameWorld.Pickups
                     PickupShieldDataComponent pickupShieldComp;
                     pickupShieldTCL.TryGetComponent(entB, out pickupShieldComp);
 
-                    setShield(equipShieldComp, equipShieldEnt, pickupShieldComp, pickupShieldEnt, ecb);
+                    setShield(equipShieldComp, equipShieldEnt, pickupShieldComp, 
+                                pickupShieldEnt, ecb, ref pickupShieldTCL);
                 }
             }
             else if(isEquiperB && isPickupA){
@@ -209,7 +261,8 @@ namespace GameWorld.Pickups
                     PickupProjectileDataComponent pickupProjectileComp;
                     pickupProjectileTCL.TryGetComponent(entA, out pickupProjectileComp);
 
-                    setProjectile(equipProjectileComp, equipProjectileEnt, pickupProjectileComp, pickupProjectileEnt, ecb);
+                    setProjectile(equipProjectileComp, equipProjectileEnt, pickupProjectileComp, 
+                                    pickupProjectileEnt, ecb, ref pickupProjectileTCL);
                 }
                 else if(equipShieldTCL.HasComponent(entB) &&
                         pickupShieldTCL.HasComponent(entA) )
@@ -222,7 +275,8 @@ namespace GameWorld.Pickups
                     PickupShieldDataComponent pickupShieldComp;
                     pickupShieldTCL.TryGetComponent(entA, out pickupShieldComp);
 
-                    setShield(equipShieldComp, equipShieldEnt, pickupShieldComp, pickupShieldEnt, ecb);
+                    setShield(equipShieldComp, equipShieldEnt, pickupShieldComp, 
+                                pickupShieldEnt, ecb, ref pickupShieldTCL);
                 }
             }
             

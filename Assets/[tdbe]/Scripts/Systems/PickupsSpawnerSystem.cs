@@ -151,15 +151,13 @@ namespace GameWorld.Pickups
             {
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<PickupsSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
-                
-               if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
+                if(!rateComponent.refreshSystemRateRequest)
                 {
-                    //Debug.Log("[PickupsSpawner][InGameSpawn] Pickup! ");
-
                     int existingCount = m_allPickups.CalculateEntityCount();
                     SpawnCapComponent spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt);
                     if(existingCount < spawnCap.maxNumber)
                     {
+                        Debug.Log("[PickupsSpawner][InGameSpawn] spawning pickups. ");
                         var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);

@@ -151,9 +151,8 @@ namespace GameWorld.NPCs
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<NPCSpawnerStateComponent>();
                 var rateComponent = SystemAPI.GetComponent<VariableRateComponent>(stateCompEnt);
                 
-                if(!rateComponent.refreshSystemRateRequest && SystemAPI.Time.ElapsedTime - rateComponent.lastUpdateRateTime >= Time.deltaTime)
+                if(!rateComponent.refreshSystemRateRequest)
                 {
-                    //Debug.Log("[NPCSpawner][InGameSpawn] UFOe! "+existingUFOCount.ToString());
                     //TODO: I would actually like this mode to spawn UFOs from the edges only
                     
                     int existingCount = m_UFOsGroup.CalculateEntityCount();
@@ -161,6 +160,7 @@ namespace GameWorld.NPCs
 
                     if(existingCount < spawnCap.maxNumber)
                     {
+                        Debug.Log("[NPCSpawner][InGameSpawn] UFOe! ");//+existingUFOCount.ToString());
                         var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);

@@ -40,7 +40,7 @@ namespace GameWorld
         {
             var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-            Debug.Log("[SimpleSpawner][InitialSpawn] spawning. Bounds, Players, initial shield pickup.. ");
+            Debug.Log("[SimpleSpawner][InitialSpawn] spawning on game start. Bounds, Players, initial shield pickup.. ");
 
             //Entity stateCompEnt = SystemAPI.GetSingletonEntity<SimpleSpawnerComponent>();
             //var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
@@ -94,7 +94,10 @@ namespace GameWorld
         private void Execute([ChunkIndexInQuery] int ciqi, in DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents, in SimpleSpawnerComponent spawnerComp)
         {
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
-            for(uint i = 0; i < spawnerComp.spawnNumber; i++){
+            for(uint i = 0; i < spawnerComp.spawnNumber; i++)
+            {
+                // TODO: spherecast in a (finite) loop for empty random places to spawn.
+                // (no asteroids or ufos)
                 Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
 
                 ecbp.AddComponent<PhysicsVelocity>(ciqi, prefabInstance, new PhysicsVelocity());
@@ -112,7 +115,8 @@ namespace GameWorld
                     });
                 }
             }
-            ecbp.DestroyEntity(ciqi, prefabsAndParents[0].prefab);     
+            if(prefabsAndParents[0].prefab != Entity.Null)
+                ecbp.DestroyEntity(ciqi, prefabsAndParents[0].prefab);     
             //spawnerCompArr.Dispose();
         }
     }
