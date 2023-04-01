@@ -5,9 +5,9 @@ namespace GameWorld.Asteroid
 {
     public class AsteroidSizeAuthoring : MonoBehaviour
     {
-        [Header("Size is dictated by AsteroidSystem and settings, \nshould go: 1, 0.5, 0.25")]
+        [Header("This is for in-game, to know what stage of spawned asteroid we are at.")]
         public float defaultSize = 1.0f;
-        public float sizeMultiplier = 1.0f;
+        public float currentSize = 1.0f;
 
         public class AsteroidSizeBaker : Baker<AsteroidSizeAuthoring>
         {
@@ -15,7 +15,7 @@ namespace GameWorld.Asteroid
             {
                 AddComponent<AsteroidSizeComponent>(new AsteroidSizeComponent{
                     defaultSize = authoring.defaultSize, 
-                    sizeMultiplier = authoring.sizeMultiplier
+                    currentSize = authoring.currentSize
                 });
             }
         }

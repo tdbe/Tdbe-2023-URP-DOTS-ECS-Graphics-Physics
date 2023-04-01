@@ -60,7 +60,7 @@ namespace GameWorld
             }
         }
 
-        //[BurstCompile] Note: reason for not bursting is `HackyGlobals.WorldBounds. 
+        //[BurstCompile] Note: reason for not bursting is mono side `HackyGlobals.WorldBounds. 
         // But this is the unity game management system, and a simple one, so I won't optimize this right now.
         public void OnUpdate(ref SystemState state)
         {
@@ -79,14 +79,14 @@ namespace GameWorld
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 InitBounds(ref state, ref ecb);
                 
-                // update variable rate systems states/rates
+                // init update systems states/rates
                 {
                     var entSingleton = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                     var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
                     {
-                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
-                        var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
-                        asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn_oneoff);
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidVRSpawnerSystem>();
+                        var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidVRSpawnerSystem>(sysHandle);
+                        asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn);
                         asteroidSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
                         variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
@@ -120,7 +120,7 @@ namespace GameWorld
                     }
                 }
 
-                // transition to running
+                // transition to Running state
                 ecb.SetComponent<GameSystemStateComponent>(
                     stateCompEnt,
                     new GameSystemStateComponent{
@@ -131,15 +131,15 @@ namespace GameWorld
             {
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                // update variable rate systems states/rates
+                // update systems states/rates
                 {
                     var entSingleton = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                     var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
                     if(variRateComp.refreshSystemRateRequest)
                     {
-                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidSpawnerSystem>();
-                        var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidSpawnerSystem>(sysHandle);
-                        asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
+                        var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidVRSpawnerSystem>();
+                        var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidVRSpawnerSystem>(sysHandle);
+                        //asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InGameSpawn);
                         asteroidSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
                         variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
@@ -153,7 +153,7 @@ namespace GameWorld
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
                         var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
-                        npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
+                        //npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
                         npcSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
                         variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;
@@ -167,7 +167,7 @@ namespace GameWorld
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
                         var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
-                        pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
+                        //pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
                         pickupsSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
                         variRateComp.lastUpdateRateTime = SystemAPI.Time.ElapsedTime;

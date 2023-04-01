@@ -181,7 +181,8 @@ namespace GameWorld.Pickups
         }
     }
 
-    // if you really wanted this job could be shared (e.g. asteroids, pickups, ufos). TODO: spawn these for loops in parallel instead
+    // TODO: spawn these for loops in parallel instead
+    // A generic spawning job over a random area + velocity, doesn't have to be used just by pickups spawner..
     [BurstCompile]
     public partial struct PickupsSpawnerJob:IJobEntity
     {

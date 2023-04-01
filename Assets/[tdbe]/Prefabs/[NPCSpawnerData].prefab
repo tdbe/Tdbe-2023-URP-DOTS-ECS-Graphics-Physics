@@ -91,7 +91,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7fe4ba960d260974fbf35e9eaa0e2400, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  burstSpawnRate_ms: 16
+  burstSpawnRate_ms: 66
   inGameSpawnRate_ms: 12500
   currentSpawnRate_ms: 12500
 --- !u!114 &2621378525696565717
@@ -106,7 +106,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 72acf8caf1b86e6418f3f3961af9ed3f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxNumber: 3
   zRange: 0
   randScaleMin: 0
   randScaleMax: 0

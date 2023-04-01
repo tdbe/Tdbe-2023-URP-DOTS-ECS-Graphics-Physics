@@ -2,6 +2,7 @@ using Unity.Entities;
 
 namespace GameWorld.Asteroid
 {
+    /*
     public struct AsteroidStateSharedComponent : ISharedComponentData
     {
         public enum AsteroidState{
@@ -10,5 +11,5 @@ namespace GameWorld.Asteroid
         }
 
         public AsteroidState asteroidState;    
-    }
+    }*/
 }

@@ -5,6 +5,6 @@ namespace GameWorld.Asteroid
     public struct AsteroidSizeComponent : IComponentData
     {
         public float defaultSize;    
-        public float sizeMultiplier;    
+        public float currentSize;    
     }
 }

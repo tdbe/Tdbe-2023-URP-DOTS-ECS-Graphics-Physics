@@ -7,9 +7,8 @@ namespace GameWorld.Asteroid
     {
         public enum State{
             Inactive = 0,
-            InitialSpawn_oneoff = 1,
-            InGameSpawn = 2,
-            TargetedSpawn_oneoff = 3
+            InitialSpawn = 1,
+            InGameSpawn = 2
         }
         public State state;
     }

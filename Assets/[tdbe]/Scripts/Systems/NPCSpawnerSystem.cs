@@ -184,7 +184,8 @@ namespace GameWorld.NPCs
         }
     }
 
-    // if you really wanted this job could be shared (e.g. asteroids, pickups, ufos). TODO: spawn these for loops in parallel instead
+    // TODO: spawn these for loops in parallel instead
+    // A generic spawning job over a random area, doesn't have to be used just by asteroid spawner..
     [BurstCompile]
     public partial struct NPCSpawnerJob:IJobEntity
     {
