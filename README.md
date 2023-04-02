@@ -38,11 +38,12 @@ Philosophy:
 - performant (threaded, bursted, instanced, masked) by default, not "well this won't hurt so much".
 - main system can control states of other systems, other systems control their own state and do their one job. (yes there can be sub-branches).
 - reuse components, systems, threads, and aspects, unless doing so becomes confusing project-management wise or future-gamedev wise.
-- at the same time, don't split up code that you don't need accessed from anywhere else yet. E.g. you can use "{ }" to separate out blocks without making actual functions that someone else won't know how to use, etc.
+- at the same time, don't split up code that you don't need accessed from anywhere else yet. E.g. you can use "{ }" to separate out blocks without making actual functions that someone else won't know when to use, etc.
 - track memory limits, pay attention to what / when you're increasing or destroying; maybe destroy everything in one system at a controlled time.
 - always think about the limits; e.g. is it bad if you wipe out all enemies on the screen at the same time?
 - use state machines; approaches are described in code (e.g. in GameSystem).
 - maybe break up large components if there is some small part you're writing to a lot.
+- mak things clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
 
 
 Some annoying quirks I found:
