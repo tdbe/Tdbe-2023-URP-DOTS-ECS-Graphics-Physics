@@ -9,10 +9,10 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
 
 
-A fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE". Everything is described in code.
+A fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE".
 
 
-The project is set up to be visible via the Hierarchy what is going on and roughly in what order, using prefabs and components with mono authorings.
+The project is set up to be visible via the Hierarchy what is going on and roughly in what order, and using prefabs and components with mono authorings, and inspector notes. Most things are also described in comments in code.
 
 
 Play:
@@ -43,7 +43,7 @@ Philosophy:
 - always think about the limits; e.g. is it bad if you wipe out all enemies on the screen at the same time?
 - use state machines; approaches are described in code (e.g. in GameSystem).
 - maybe break up large components if there is some small part you're writing to a lot.
-- mak things clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
+- make things clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
 
 
 Some annoying quirks I found:
