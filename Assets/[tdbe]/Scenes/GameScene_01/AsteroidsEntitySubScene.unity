@@ -175,7 +175,7 @@ GameObject:
   - component: {fileID: 541473559}
   - component: {fileID: 541473560}
   m_Layer: 0
-  m_Name: '[ShootingSystemData]'
+  m_Name: '[ProjectileSystemData]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

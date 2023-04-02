@@ -136,7 +136,6 @@ namespace GameWorld.NPCs
             }.Schedule(state.Dependency);
 
             jhandle.Complete();
-            //ecb.DestroyEntity(UFOSpawnAspect.UFOPrefab);
         }
 
         [BurstCompile]

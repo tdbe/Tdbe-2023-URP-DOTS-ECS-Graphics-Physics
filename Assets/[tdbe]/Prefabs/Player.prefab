@@ -940,7 +940,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7215400412842331241}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.5, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1144,7 +1144,10 @@ MonoBehaviour:
   active: 1
   activeVisual: {fileID: 0}
   prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
-  timeToLive: 2000
+  timeToLive: 1
+  speed: 400
+  scale: 1
+  pickupTimeToLive: -1
   isCollisionInvulnerable: 0
 --- !u!114 &-8852127702617716055
 MonoBehaviour:
@@ -1160,9 +1163,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   owner: {fileID: 7215400412842331241}
-  activeVisual: {fileID: 0}
+  spawnedVisual: {fileID: 0}
   prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
-  timeToLive: 2000
+  timeToLive: 1
+  speed: 400
+  scale: 1
+  pickupTime: 0
+  pickupTimeToLive: -1
   isCollisionInvulnerable: 0
 --- !u!114 &5288423428541713879
 MonoBehaviour:
@@ -1178,8 +1185,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   owner: {fileID: 7215400412842331241}
-  activeVisual: {fileID: 0}
-  timeToLive: 2000
+  spawnedVisual: {fileID: 0}
+  pickupTime: 0
+  pickupTimeToLive: 0
 --- !u!1 &8301162057508823376
 GameObject:
   m_ObjectHideFlags: 0

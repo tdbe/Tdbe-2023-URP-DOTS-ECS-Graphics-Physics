@@ -1456,7 +1456,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4377867094261573720}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 100, y: 100, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1557,9 +1557,9 @@ MonoBehaviour:
   ConnectedBody: {fileID: 0}
   EnableCollision: 0
   MaxImpulse:
-    x: Infinity
-    y: Infinity
-    z: Infinity
+    x: 2
+    y: 2
+    z: 2
   LockLinearAxes:
     x: 0
     y: 0
@@ -1607,8 +1607,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 1
   activeVisual: {fileID: 4107237136837000114, guid: 505284f62c6026f418f53422f2c8b1a2, type: 3}
-  prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
-  timeToLive: 2000
+  prefab: {fileID: 8971911639874653510, guid: 480dcd8ad616d37469ca73c54335dab9, type: 3}
+  timeToLive: 2
+  speed: 400
+  scale: 2
+  pickupTimeToLive: 5
   isCollisionInvulnerable: 1
 --- !u!1 &4468848779926832170
 GameObject:

@@ -8,7 +8,11 @@ namespace GameWorld.Pickups
         public Entity owner;
         public Entity spawnedVisual;
         public Entity prefab;
-        public float timeToLive;
+        public double timeToLive;
+        public float speed;
+        public float scale;
+        public double pickupTime;
+        public double pickupTimeToLive;
         public bool isCollisionInvulnerable;
     }
 }

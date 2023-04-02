@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 293854377162877310}
   - component: {fileID: -5405703995732271580}
   - component: {fileID: 7665899005918751441}
+  - component: {fileID: 7956516815164481428}
   m_Layer: 11
   m_Name: Asteroid
   m_TagString: Untagged
@@ -50,7 +51,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultSize: 1
-  sizeMultiplier: 1
+  currentSize: 1
 --- !u!54 &4022959596773681515
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -167,6 +168,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d454c3e11f4be9479e91a14437f07bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  warpImmunityPeriod: 0.5
+--- !u!114 &7956516815164481428
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85503138005864851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 72acf8caf1b86e6418f3f3961af9ed3f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  zRange: 0
+  randScaleMin: 0
+  randScaleMax: 0
+  scaleBump: 0
+  coinTossOnScaleMod: 0
+  initialNumber: 0
+  initialImpulse: 1.25
 --- !u!1 &1956344202431443219
 GameObject:
   m_ObjectHideFlags: 0

@@ -11,7 +11,8 @@ namespace GameWorld.Pickups
         public GameObject owner;
         [Header("Spawned active visual on owner, e.g. gun.")]
         public GameObject spawnedVisual;
-        public float timeToLive = 2000;
+        public double pickupTime = 0;
+        public double pickupTimeToLive = 1;
         
         public class EquippedShieldDataBaker : Baker<EquippedShieldDataAuthoring>
         {
@@ -21,7 +22,8 @@ namespace GameWorld.Pickups
                     active = authoring.active,
                     owner = GetEntity(authoring.owner),
                     spawnedVisual = GetEntity(authoring.spawnedVisual),
-                    timeToLive = authoring.timeToLive
+                    pickupTime = authoring.pickupTime,
+                    pickupTimeToLive = authoring.pickupTimeToLive
                 });
             }
         }

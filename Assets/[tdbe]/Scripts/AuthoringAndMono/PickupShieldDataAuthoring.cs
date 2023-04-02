@@ -8,7 +8,8 @@ namespace GameWorld.Pickups
         [Header("This component can be on a pickup or on a player/npc. \nIf it's on a player/npc then it represents the owner's default.")]
         public bool active = true;
         public GameObject activeVisual;
-        public float timeToLive;
+        //public double pickupTime = 0;
+        public double pickupTimeToLive = 1;
         public class PickupShieldBaker : Baker<PickupShieldDataAuthoring>
         {
             public override void Bake(PickupShieldDataAuthoring authoring)
@@ -16,7 +17,8 @@ namespace GameWorld.Pickups
                 AddComponent<PickupShieldDataComponent>(new PickupShieldDataComponent{
                    active = authoring.active,
                    activeVisual = GetEntity(authoring.activeVisual),
-                   timeToLive = authoring.timeToLive
+                   //pickupTime = authoring.pickupTime,
+                   pickupTimeToLive = authoring.pickupTimeToLive
                 });
             }
         }

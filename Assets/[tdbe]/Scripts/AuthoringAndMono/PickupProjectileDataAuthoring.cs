@@ -10,6 +10,10 @@ namespace GameWorld.Pickups
         public GameObject activeVisual;
         public GameObject prefab;
         public float timeToLive;
+        public float speed = 1;
+        public float scale = 1;
+        //public double pickupTime = 0;
+        public double pickupTimeToLive = 1;
         public bool isCollisionInvulnerable;
         public class PickupProjectileBaker : Baker<PickupProjectileDataAuthoring>
         {
@@ -20,6 +24,10 @@ namespace GameWorld.Pickups
                    activeVisual = GetEntity(authoring.activeVisual),
                    prefab = GetEntity(authoring.prefab),
                    timeToLive = authoring.timeToLive,
+                   speed = authoring.speed,
+                   scale = authoring.scale,
+                   //pickupTime = authoring.pickupTime,
+                   pickupTimeToLive = authoring.pickupTimeToLive,
                    isCollisionInvulnerable = authoring.isCollisionInvulnerable
                 });
             }

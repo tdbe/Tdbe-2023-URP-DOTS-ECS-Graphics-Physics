@@ -19,7 +19,6 @@ namespace GameWorld.Players
     public partial struct  PlayerMovementSystem : ISystem
     {
         private EntityQuery m_playersEQG;
-        private EntityQuery m_playerMovelentSysEQG;
         private EntityQuery m_boundsGroup;
         
 

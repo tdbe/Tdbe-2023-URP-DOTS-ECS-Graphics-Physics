@@ -2,9 +2,10 @@ using Unity.Burst;
 using Unity.Entities;
 using Unity.Collections;
 using UnityEngine;
-
+using Unity.Transforms;
 using GameWorld.Players;
 using Unity.Physics;
+using Unity.Mathematics;
 
 namespace GameWorld
 {
@@ -77,6 +78,13 @@ namespace GameWorld
                         Value = prefabsAndParents[0].parent
                     });
                 }
+
+                ecbp.AddComponent<LocalTransform>(ciqi, prefabInstance, 
+                    new LocalTransform{ 
+                        Position = float3.zero,
+                        Rotation = quaternion.identity,
+                        Scale = 1
+                    });
             }
             //ecbp.DestroyEntity(ciqi, prefabsAndParents[0].prefab);     
             //spawnerCompArr.Dispose();
@@ -116,7 +124,7 @@ namespace GameWorld
                 }
             }
             if(prefabsAndParents[0].prefab != Entity.Null)
-                ecbp.DestroyEntity(ciqi, prefabsAndParents[0].prefab);     
+                ecbp.AddComponent<DeadDestroyTag>(ciqi, prefabsAndParents[0].prefab);     
             //spawnerCompArr.Dispose();
         }
     }

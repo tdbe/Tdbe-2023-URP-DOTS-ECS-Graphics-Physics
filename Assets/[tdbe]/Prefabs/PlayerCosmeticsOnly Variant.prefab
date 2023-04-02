@@ -118,7 +118,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7215400412842331241, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
       propertyPath: m_Name
-      value: PlayerCosmeticsOnly
+      value: PlayerCosmeticsOnly Variant
       objectReference: {fileID: 0}
     - target: {fileID: 7215400412842331241, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
       propertyPath: m_Layer
@@ -147,6 +147,10 @@ PrefabInstance:
     - {fileID: -5494139891945127095, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
     - {fileID: -9167793692624998374, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
     - {fileID: -3081616015688867146, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
+    - {fileID: 5288423428541713879, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
+    - {fileID: 4644322724490792291, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
+    - {fileID: 6327725319107188102, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
+    - {fileID: -4586719085642723876, guid: 61ae1293c80a4c4419b6ee9ce266c6fb, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

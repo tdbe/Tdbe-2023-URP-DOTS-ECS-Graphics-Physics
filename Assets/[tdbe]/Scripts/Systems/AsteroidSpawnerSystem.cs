@@ -187,7 +187,8 @@ namespace GameWorld.Asteroid
     [BurstCompile]
     public partial struct AsteroidSpawnerSystem : ISystem
     {
-        private EntityQuery m_asteroidsGroup;
+        private EntityQuery m_liveAsteroidsGroup;
+        private EntityQuery m_dedAsteroidsGroup;
         private EntityQuery m_boundsGroup;
 
         public void SetNewState(ref SystemState state, AsteroidSpawnerStateComponent.State newState)
@@ -213,7 +214,13 @@ namespace GameWorld.Asteroid
             state.RequireForUpdate<RandomnessComponent>();
             state.RequireForUpdate<AsteroidSpawnerStateComponent>();
 
-            m_asteroidsGroup = state.GetEntityQuery(ComponentType.ReadOnly<AsteroidSizeComponent>());
+            m_liveAsteroidsGroup = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<AsteroidSizeComponent>()
+                .WithNone<DeadDestroyTag>()
+                );
+            m_dedAsteroidsGroup = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp)
+                .WithAll<AsteroidSizeComponent, DeadDestroyTag>()
+                );
 
             state.RequireForUpdate<BoundsTagComponent>();
             m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());
@@ -284,8 +291,8 @@ namespace GameWorld.Asteroid
 
         [BurstCompile]
         private void DoTargetedSpawn(ref SystemState state, ref EntityCommandBuffer ecb, ref Entity stateCompEnt, 
-                                    AsteroidSpawnerStateComponent.State spawnerState, int existingCount,
-                                    DynamicBuffer<SpawnOneoffRequestsBufferComponent> spawnOneoffBuffer)
+                                    AsteroidSpawnerStateComponent.State spawnerState, int existingCount
+                                    )
         {
             RandomSpawnedSetupAspect spawnAspect = SystemAPI.GetAspectRW<RandomSpawnedSetupAspect>(stateCompEnt);
 
@@ -301,17 +308,15 @@ namespace GameWorld.Asteroid
     
             var rga = SystemAPI.GetComponent<RandomnessComponent>(stateCompEnt).randomGeneratorArr;
             var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
-            var jhandle = new AsteroidTargetedSpawnerJob
+            state.Dependency = new AsteroidTargetedSpawnerJob
             {
-                ecb = ecb,
+                ecbp = ecb.AsParallelWriter(),
                 existingCount = existingCount,
                 rga = rga,
                 prefabsAndParents = prefabsAndParents,
-                spawnOneoffBuffer = spawnOneoffBuffer
-            }.Schedule(state.Dependency);
+                spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt)
+            }.ScheduleParallel(m_dedAsteroidsGroup, state.Dependency);
 
-            jhandle.Complete();
-            spawnOneoffBuffer.Clear();
         }
 
         [BurstCompile]
@@ -325,7 +330,7 @@ namespace GameWorld.Asteroid
             {
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
 
-                int existingCount = m_asteroidsGroup.CalculateEntityCount();
+                int existingCount = m_liveAsteroidsGroup.CalculateEntityCount();
                 SpawnCapComponent spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt);
                 
                 if(existingCount < spawnCap.maxNumber)
@@ -345,15 +350,11 @@ namespace GameWorld.Asteroid
             else if(spawnerState.state == AsteroidSpawnerStateComponent.State.InGameSpawn)
             {
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
-                var spawnOneoffBuffer = SystemAPI.GetBuffer<SpawnOneoffRequestsBufferComponent>(stateCompEnt);
-                if (!spawnOneoffBuffer.IsEmpty)
-                {
-                    var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
-                    var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
-                    int existingCount = m_asteroidsGroup.CalculateEntityCount();
-                    DoTargetedSpawn(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount, spawnOneoffBuffer);
-                }
                 
+                var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+                int existingCount = m_liveAsteroidsGroup.CalculateEntityCount();
+                DoTargetedSpawn(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
             }
         }
     }
@@ -411,14 +412,14 @@ namespace GameWorld.Asteroid
 
 
     // Fairly generic but only makes sense for asteroids.
-    // Spawns countRequest children according to SpawnOneoffRequestsBufferComponent,
-    // in a random area the size of scaleRequest, at positionRequest.
+    // Spawns children according to dead asteroid position and scale etc.
+    // Still uses RandomSpawnedSetupAspect area, but the area is the size of the dead asteroid.
     [BurstCompile]
     public partial struct AsteroidTargetedSpawnerJob:IJobEntity
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
         private int thri;
-        public EntityCommandBuffer ecb;
+        public EntityCommandBuffer.ParallelWriter ecbp;
         [ReadOnly]
         public int existingCount;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
@@ -426,49 +427,51 @@ namespace GameWorld.Asteroid
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
         [ReadOnly]
-        public DynamicBuffer<SpawnOneoffRequestsBufferComponent> spawnOneoffBuffer;
+        public SpawnCapComponent spawnCap;
 
-        // TODO: maybe do parallel spawning
         [BurstCompile]
-        private void Execute(in RandomSpawnedSetupAspect spawnAspect, in SpawnCapComponent spawnCap, in AsteroidSpawnerStateComponent assctag)
-        {
+        private void Execute([ChunkIndexInQuery] int ciqi, Entity asteroidEnt, 
+                            in RandomSpawnedSetupAspect spawnAspect, in AsteroidSizeComponent ascomp,
+                            in DeadDestroyTag ded, in LocalToWorld ltow)
+        {           // this is cool because we can cheaply process all destroyed asteroids in parallel.
+            if(ascomp.childrenToSpawn + existingCount >= spawnCap.maxNumber){
+                //Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
+                return;
+            }
+            // smallest asteroids die without any spawns
+            if(ascomp.currentSize <= ascomp.minSize){
+                return;
+            }
             Unity.Mathematics.Random rg = rga[thri];
-            int i = 0;
-            foreach(var spawnReq in spawnOneoffBuffer)
-            {
-                if(i * spawnReq.countRequest + existingCount >= spawnCap.maxNumber){
-                    //Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
-                    break;
-                }
 
-                float offset = -spawnReq.scaleRequest/2;
-                for(int r = 0; r<spawnReq.countRequest; r++)
-                {                
-                    Entity ent = ecb.Instantiate(prefabsAndParents[0].prefab);
+            float offset = -ascomp.currentSize/2;
+            for(int r = 0; r<ascomp.childrenToSpawn; r++)
+            {                
+                Entity ent = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
 
-                    LocalTransform newTransform = spawnAspect.GetTransform(
-                        ref rg, 
-                        spawnReq.positionRequest + new float3(-offset, -offset, 0), 
-                        spawnReq.positionRequest + new float3(offset, offset, 0)
-                    );
-                    newTransform.Scale = spawnReq.scaleRequest;
-                    ecb.SetComponent<LocalTransform>(ent, newTransform);
+                LocalTransform newTransform = spawnAspect.GetTransform(
+                    ref rg, 
+                    ltow.Position + new float3(-offset, -offset, 0), 
+                    ltow.Position + new float3(offset, offset, 0)
+                );
+                newTransform.Scale = ascomp.currentSize/ascomp.childrenToSpawn;
+                ecbp.SetComponent<LocalTransform>(ciqi, ent, newTransform);
 
-                    // TODO: I'll use physicsVelocity applyImpulse when I get to the Player move forces.
-                    ecb.SetComponent<PhysicsVelocity>(ent, spawnAspect.GetPhysicsVelocity(ref rg));
+                // TODO: I'll use physicsVelocity applyImpulse when I get to the Player move forces.
+                ecbp.SetComponent<PhysicsVelocity>(ciqi, ent, spawnAspect.GetPhysicsVelocity(ref rg));
 
-                    ecb.SetComponent<AsteroidSizeComponent>(ent, new AsteroidSizeComponent{
-                        defaultSize = spawnReq.defaultScale,
-                        currentSize = spawnReq.scaleRequest
+                ecbp.SetComponent<AsteroidSizeComponent>(ciqi, ent, new AsteroidSizeComponent{
+                    defaultSize = ascomp.defaultSize,
+                    currentSize = newTransform.Scale,
+                    childrenToSpawn = newTransform.Scale <= ascomp.minSize? 0 : ascomp.childrenToSpawn,
+                    minSize = ascomp.minSize
+                });
+
+                if(prefabsAndParents.Length>0){
+                    ecbp.AddComponent<Unity.Transforms.Parent>(ciqi, ent, new Unity.Transforms.Parent{ 
+                            Value = prefabsAndParents[0].parent
                     });
-
-                    if(prefabsAndParents.Length>0){
-                        ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
-                                Value = prefabsAndParents[0].parent
-                        });
-                    }
                 }
-                i++;
             }
             rga[thri] = rg;
         }

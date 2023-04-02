@@ -212,6 +212,15 @@ namespace GameWorld.Pickups
                 }
                 int which = rg.NextInt(0, prefabsAndParents.Length);
 
+                // TODO: WTF:
+                // - this is a BeginInitialization ECB
+                // - I instantiate on it
+                // - then I set local transform on it
+                // And yet, the physics ITriggerEventsJob picks it up
+                // for 1 frame, at 0,0,0 even though it should have never
+                // been at 0,0,0, because it was spawned with a nonzero localtransform!
+                // wut?
+
                 Entity ent = ecb.Instantiate(prefabsAndParents[which].prefab);
 
                 ecb.SetComponent<LocalTransform>(ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));

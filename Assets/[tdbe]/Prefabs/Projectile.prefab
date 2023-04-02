@@ -132,7 +132,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -199,13 +199,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3892898844034912754}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.082, y: 0.98, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 755424245348440270}
   m_Father: {fileID: 0}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!54 &71479291427039498
 Rigidbody:
@@ -232,7 +232,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 8
+  m_Constraints: 24
   m_CollisionDetection: 0
 --- !u!114 &3691373375151876383
 MonoBehaviour:
@@ -300,9 +300,9 @@ MonoBehaviour:
   ConnectedBody: {fileID: 0}
   EnableCollision: 0
   MaxImpulse:
-    x: Infinity
-    y: Infinity
-    z: Infinity
+    x: 10
+    y: 10
+    z: 10
   LockLinearAxes:
     x: 0
     y: 0
@@ -336,6 +336,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbd467602035a8c44b4758ba9edf8e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  info: Stores owner, and time to live.
   owner: {fileID: 0}
   timeToLive: 2000
 --- !u!1 &8679236359663512800
