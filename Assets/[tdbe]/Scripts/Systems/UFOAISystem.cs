@@ -29,7 +29,7 @@ namespace GameWorld.NPCs
         public void OnCreate(ref SystemState state)
         {
 
-            state.RequireForUpdate<PlayerComponent>();
+            //state.RequireForUpdate<PlayerComponent>();
             state.RequireForUpdate<UFOComponent>();
             state.RequireForUpdate<BoundsTagComponent>();
 
@@ -99,9 +99,11 @@ namespace GameWorld.NPCs
         {
             float least_sqDistEucliOrPortal = float.MaxValue;
             float3 target_forLeastDist = ufoLtrans.Position;
+            bool playersExist = false;
             // for now we don't care about any further knowledge than just, closest distance one or another.
             foreach(float3 playerPos in playerPosArr)
             {
+                playersExist = true;
                 float sqDistEuclid = math.distancesq(playerPos, ufoLtoW.Position);
                 if(least_sqDistEucliOrPortal > sqDistEuclid)
                 {
@@ -140,10 +142,10 @@ namespace GameWorld.NPCs
                 }
             } 
 
-            // move towards player
+            // move towards player or patrol
             {
                 float totalDist = math.sqrt(least_sqDistEucliOrPortal);
-                if(totalDist <= ufoC.maxChaseDist && totalDist >= ufoC.minChaseDist)
+                if(playersExist && totalDist <= ufoC.maxChaseDist && totalDist >= ufoC.minChaseDist)
                 {
                     var newLtrans = new LocalTransform{
                         Position = ufoLtrans.Position,
