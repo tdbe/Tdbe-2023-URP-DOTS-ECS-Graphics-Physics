@@ -6,8 +6,10 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 .'s 1.0 sandbox
 - player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
+![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
 
-A fairly wide scope of ECS DAO usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE". Everything is described in code.
+
+A fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE". Everything is described in code.
 
 
 The project is set up to be visible via the Hierarchy what is going on and roughly in what order, using prefabs and components with mono authorings.
@@ -53,6 +55,5 @@ Some annoying quirks I found:
 - Getting collision hit points. I get it, but cumbersome UX...
 
 
-![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
 ![image](https://user-images.githubusercontent.com/1399607/228077452-9fc860c3-e4eb-4a14-a27d-3230db34fdf4.png)
 ![image](https://user-images.githubusercontent.com/1399607/228080576-c4664bf1-46d0-47a9-adca-17458bbd6c09.png)
