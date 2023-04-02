@@ -466,7 +466,7 @@ namespace GameWorld.Asteroid
                     ltow.Position + new float3(-offset, -offset, 0), 
                     ltow.Position + new float3(offset, offset, 0)
                 );
-                newTransform.Scale = ascomp.currentSize/ascomp.childrenToSpawn;
+                newTransform.Scale = (ascomp.currentSize*math.min(ascomp.childrenToSpawn,1.5f))/ascomp.childrenToSpawn;
                 ecbp.SetComponent<LocalTransform>(ciqi, ent, newTransform);
 
                 // TODO: I'll use physicsVelocity applyImpulse when I get to the Player move forces.

@@ -53,7 +53,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   defaultSize: 1
-  minSize: 0.25
+  minSize: 0.5
   currentSize: 1
   childrenToSpawn: 2
 --- !u!54 &4022959596773681515
