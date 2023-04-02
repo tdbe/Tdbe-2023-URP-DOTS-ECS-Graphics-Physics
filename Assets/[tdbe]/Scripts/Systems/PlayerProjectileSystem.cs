@@ -107,12 +107,15 @@ namespace GameWorld.Players
                 });
                 if(equippedProjectile.isCollisionInvulnerable)
                 {
+                    // this means it does not get destroyed on collision
+                    // in other words, health won't go down while invulnerable.
                     ecbp.AddComponent<InvulnerableTag>(ciqi, spawnedProj, new InvulnerableTag());
                 }
                 ecbp.AddComponent<HealthComponent>(ciqi, spawnedProj, new HealthComponent{
                     timeToLive = equippedProjectile.timeToLive,
                     spawnTime = currentTime,
-                    health = 1
+                    currentHealth = 1,
+                    maxHealth = 1
                 });
                 var mass = PhysicsMass.CreateDynamic(MassProperties.UnitSphere, 1);
                 var velocity = new PhysicsVelocity();

@@ -24,7 +24,9 @@ namespace GameWorld.Pickups
         }
     }
 
+    //[UpdateAfter(typeof(FixedStepSimulationSystemGroup))]
     [UpdateInGroup(typeof(PickupsSpawnerVRUpdateGroup))]
+    //[UpdateBefore(typeof(TransformSystemGroup))]
     [BurstCompile]
     public partial struct PickupsSpawnerSystem : ISystem
     {

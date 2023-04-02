@@ -23,6 +23,7 @@ namespace GameWorld
         {
             state.RequireForUpdate<GameSystemStateComponent>();
             state.RequireForUpdate<AsteroidSpawnerStateComponent>();
+            state.RequireForUpdate<AsteroidVRSpawnerTag>();
             state.RequireForUpdate<NPCSpawnerStateComponent>();
             state.RequireForUpdate<BoundsTagComponent>();
 
@@ -81,11 +82,12 @@ namespace GameWorld
                 
                 // init update systems states/rates
                 {
-                    var entSingleton = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
+                    var entSingleton = SystemAPI.GetSingletonEntity<AsteroidVRSpawnerTag>();
                     var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<AsteroidVRSpawnerSystem>();
                         var asteroidSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<AsteroidVRSpawnerSystem>(sysHandle);
+                        // I don't like doing this but variable rate groups are annoying...
                         asteroidSpawner.SetNewState(ref state, AsteroidSpawnerStateComponent.State.InitialSpawn);
                         asteroidSpawner.SetNewRate(ref state);
                         variRateComp.refreshSystemRateRequest = false;
@@ -99,6 +101,7 @@ namespace GameWorld
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<NPCSpawnerSystem>();
                         var npcSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<NPCSpawnerSystem>(sysHandle);
+                        // I don't like doing this but variable rate groups are annoying...
                         npcSpawner.SetNewRate(ref state);
                         npcSpawner.SetNewState(ref state, NPCSpawnerStateComponent.State.InGameSpawn);
                         variRateComp.refreshSystemRateRequest = false;
@@ -112,6 +115,7 @@ namespace GameWorld
                     {
                         var sysHandle = World.DefaultGameObjectInjectionWorld.GetExistingSystem<PickupsSpawnerSystem>();
                         var pickupsSpawner = World.DefaultGameObjectInjectionWorld.Unmanaged.GetUnsafeSystemRef<PickupsSpawnerSystem>(sysHandle);
+                        // I don't like doing this but variable rate groups are annoying...
                         pickupsSpawner.SetNewRate(ref state);
                         pickupsSpawner.SetNewState(ref state, PickupsSpawnerStateComponent.State.InGameSpawn);
                         variRateComp.refreshSystemRateRequest = false;
@@ -133,7 +137,7 @@ namespace GameWorld
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 // update systems states/rates
                 {
-                    var entSingleton = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
+                    var entSingleton = SystemAPI.GetSingletonEntity<AsteroidVRSpawnerTag>();
                     var variRateComp = SystemAPI.GetComponent<VariableRateComponent>(entSingleton);
                     if(variRateComp.refreshSystemRateRequest)
                     {

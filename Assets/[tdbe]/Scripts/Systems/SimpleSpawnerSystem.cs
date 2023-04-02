@@ -9,6 +9,8 @@ using Unity.Mathematics;
 
 namespace GameWorld
 {
+    [UpdateBefore(typeof(TransformSystemGroup))]
+    [UpdateAfter(typeof(FixedStepSimulationSystemGroup))]
     [BurstCompile]
     public partial struct SimpleSpawnerSystem : ISystem
     {

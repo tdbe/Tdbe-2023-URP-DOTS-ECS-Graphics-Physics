@@ -26,8 +26,10 @@ namespace GameWorld.NPCs
     }
 
     // TODO: should try organizing in some writegroups and jobs and/or some externals here e.g. across ufo, asteroid, powerup spawning.
-    // But also, conceptually spealking, in general gamedev, these are 3 categories of things that normally shouldn't have common links.
+    // But also, conceptually spealking, in general gamedev, these are 3 types of spawners that shouldn't have common links.
+    //[UpdateAfter(typeof(FixedStepSimulationSystemGroup))]
     [UpdateInGroup(typeof(NPCSpawnerVRUpdateGroup))]
+    //[UpdateBefore(typeof(TransformSystemGroup))]
     [BurstCompile]
     public partial struct NPCSpawnerSystem : ISystem
     {

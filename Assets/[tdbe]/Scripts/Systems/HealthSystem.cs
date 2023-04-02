@@ -14,10 +14,10 @@ using GameWorld.Pickups;
 namespace GameWorld
 {
     
-    [UpdateAfter(typeof(GameSystem))]
-    [UpdateAfter(typeof(GameWorld.Asteroid.AsteroidSpawnerSystem))]
-    [UpdateAfter(typeof(GameWorld.Players.PlayerProjectileSystem))]
-    
+    //[UpdateAfter(typeof(GameSystem))]
+    //[UpdateAfter(typeof(GameWorld.Asteroid.AsteroidTargetedSpawnerSystem))]
+    //[UpdateAfter(typeof(GameWorld.Players.PlayerProjectileSystem))]
+    //
     [UpdateInGroup(typeof(LateSimulationSystemGroup))]
     [BurstCompile]
     public partial struct  HealthSystem : ISystem
@@ -60,7 +60,7 @@ namespace GameWorld
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_healthEQG_notded, state.Dependency);
             
-            // TODO: this one needs to be optimized in a couple of ways
+            // TODO: this one needs to be optimized and synced better
             state.Dependency.Complete();
             state.Dependency = new CheckShieldsJob
             {
@@ -90,11 +90,11 @@ namespace GameWorld
                             in HealthComponent healthComp, 
                             in Entity ent)
         {
-            if(healthComp.spawnTime + healthComp.timeToLive < currentTime )
+            if( healthComp.timeToLive >-1 && healthComp.spawnTime + healthComp.timeToLive < currentTime )
             {
                 ecbp.AddComponent<DeadDestroyTag>(ciqi, ent);
             }
-            else if(healthComp.health <= 0.0f)
+            else if(healthComp.currentHealth <= 0.0f)
             {
                 ecbp.AddComponent<DeadDestroyTag>(ciqi, ent);
             }
@@ -138,6 +138,7 @@ namespace GameWorld
                             in Entity ent)
         {
             ecbp.DestroyEntity(ciqi, ent);
+            // TODO: get all children and destroy -- pickups don't get destroyed.
         }
     }
 

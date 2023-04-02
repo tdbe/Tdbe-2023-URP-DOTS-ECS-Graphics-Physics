@@ -22,7 +22,7 @@ namespace GameWorld.Pickups
         //EntityQuery m_eqProjectileGroup;
         //EntityQuery m_eqShieldGroup;
         
-        ComponentLookup<PlayerComponent> m_playersTCL;// this could be made more generic, ie also UFOs
+        ComponentLookup<PlayerComponent> m_playersTCL;// TODO: this could be made more generic, ie also UFOs
         ComponentLookup<PickupTag> m_pickupTCL;
 
         ComponentLookup<EquippedProjectileDataComponent> m_equipProjectileTCL;

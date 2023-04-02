@@ -1,7 +1,7 @@
 using UnityEngine;
 using Unity.Entities;
 
-namespace GameWorld
+namespace GameWorld.Invulnerables
 {
     public class InvulnerableTagAuthoring : MonoBehaviour
     {
