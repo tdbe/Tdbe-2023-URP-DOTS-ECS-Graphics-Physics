@@ -158,7 +158,7 @@ namespace GameWorld.Pickups
                     if(existingCount < spawnCap.maxNumber)
                     {
                         Debug.Log("[PickupsSpawner][InGameSpawn] spawning pickups. ");
-                        var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                        var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
 

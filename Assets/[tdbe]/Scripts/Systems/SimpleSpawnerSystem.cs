@@ -39,7 +39,7 @@ namespace GameWorld
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+            var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             Debug.Log("[SimpleSpawner][InitialSpawn] spawning on game start. Bounds, Players, initial shield pickup.. ");
 

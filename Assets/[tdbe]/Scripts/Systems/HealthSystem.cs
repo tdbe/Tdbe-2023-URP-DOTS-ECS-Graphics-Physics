@@ -60,7 +60,7 @@ namespace GameWorld
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_healthEQG_notded, state.Dependency);
             
-            // TODO: this needs to be optimized like ^
+            // TODO: this one needs to be optimized in a couple of ways
             state.Dependency.Complete();
             state.Dependency = new CheckShieldsJob
             {
@@ -75,6 +75,7 @@ namespace GameWorld
             {
                 ecbp = ecbEnd.AsParallelWriter(),
             }.ScheduleParallel(m_DeadDestroyEQG, state.Dependency);
+            state.Dependency.Complete();
         }
     }
 

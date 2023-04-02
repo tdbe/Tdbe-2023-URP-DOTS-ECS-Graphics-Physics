@@ -336,7 +336,7 @@ namespace GameWorld.Asteroid
                 if(existingCount < spawnCap.maxNumber)
                 {
                     Debug.Log("[AsteroidSpawner][InitialSpawn] spawning. ");
-                    var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                    var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
                     var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                     DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
                     
@@ -351,7 +351,7 @@ namespace GameWorld.Asteroid
             {
                 Entity stateCompEnt = SystemAPI.GetSingletonEntity<AsteroidSpawnerStateComponent>();
                 
-                var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 int existingCount = m_liveAsteroidsGroup.CalculateEntityCount();
                 DoTargetedSpawn(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);

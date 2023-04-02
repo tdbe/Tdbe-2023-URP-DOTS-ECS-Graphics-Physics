@@ -160,7 +160,7 @@ namespace GameWorld.NPCs
                     if(existingCount < spawnCap.maxNumber)
                     {
                         Debug.Log("[NPCSpawner][InGameSpawn] UFOe! ");//+existingUFOCount.ToString());
-                        var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
+                        var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
                         var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                         DoSpawnOnMap(ref state, ref ecb, ref stateCompEnt, spawnerState.state, existingCount);
 
