@@ -925,6 +925,7 @@ GameObject:
   - component: {fileID: 4644322724490792291}
   - component: {fileID: -8852127702617716055}
   - component: {fileID: 5288423428541713879}
+  - component: {fileID: -4905520071654626234}
   m_Layer: 20
   m_Name: Player
   m_TagString: Untagged
@@ -1188,6 +1189,21 @@ MonoBehaviour:
   spawnedVisual: {fileID: 0}
   pickupTime: 0
   pickupTimeToLive: 0
+--- !u!114 &-4905520071654626234
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7215400412842331241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1ffd2d58651cc43a714419d699b924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  info: Stores health and spawn time and time to live. Used by game systems.
+  maxHealth: 1000
+  currentHealth: 1000
 --- !u!1 &8301162057508823376
 GameObject:
   m_ObjectHideFlags: 0

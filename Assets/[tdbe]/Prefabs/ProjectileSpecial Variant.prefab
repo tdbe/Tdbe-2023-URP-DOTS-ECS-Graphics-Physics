@@ -260,6 +260,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: -5323904660337702340, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+      propertyPath: maxHealth
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -5323904660337702340, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+      propertyPath: currentHealth
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 755424245348440270, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
       propertyPath: m_LocalScale.x
       value: 1
@@ -319,6 +327,14 @@ PrefabInstance:
     - target: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
       propertyPath: m_Name
       value: ProjectileSpecial Variant
+      objectReference: {fileID: 0}
+    - target: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4840698868045245190, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+      propertyPath: damagePerHit
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8778295847252871843, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
       propertyPath: m_LocalScale.x

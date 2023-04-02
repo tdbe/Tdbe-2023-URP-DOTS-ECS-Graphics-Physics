@@ -328,6 +328,8 @@ GameObject:
   - component: {fileID: 275434957294820933}
   - component: {fileID: -8755101200001700559}
   - component: {fileID: 8792118383438507148}
+  - component: {fileID: 4840698868045245190}
+  - component: {fileID: -5323904660337702340}
   m_Layer: 21
   m_Name: Projectile
   m_TagString: Untagged
@@ -483,6 +485,34 @@ MonoBehaviour:
   info: Stores owner, and time to live.
   owner: {fileID: 0}
   timeToLive: 2000
+--- !u!114 &4840698868045245190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3892898844034912754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6275ad319cc658a4bbc8606ef872a0d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagePerHit: 1
+--- !u!114 &-5323904660337702340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3892898844034912754}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1ffd2d58651cc43a714419d699b924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  info: Stores health and spawn time and time to live. Used by game systems.
+  maxHealth: 1
+  currentHealth: 1
 --- !u!1 &8679236359663512800
 GameObject:
   m_ObjectHideFlags: 0

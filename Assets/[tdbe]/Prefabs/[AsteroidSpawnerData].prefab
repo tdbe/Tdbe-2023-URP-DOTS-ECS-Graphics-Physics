@@ -9,13 +9,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4121871349082483645}
-  - component: {fileID: 4121871349082483633}
+  - component: {fileID: 8003460075810691490}
   - component: {fileID: 4121871349082483632}
   - component: {fileID: 4121871349082483634}
   - component: {fileID: 5846359511261124064}
   - component: {fileID: 725448847757670726}
   - component: {fileID: 6030358161095437526}
-  - component: {fileID: 1122926985408508303}
   m_Layer: 0
   m_Name: '[AsteroidSpawnerData]'
   m_TagString: Untagged
@@ -38,7 +37,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: -1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4121871349082483633
+--- !u!114 &8003460075810691490
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -47,10 +46,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 4121871349082483644}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 808499cadb72b96498f19a535c3829ea, type: 3}
+  m_Script: {fileID: 11500000, guid: 880f85e43825a3444a6432e2a74256d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  state: 0
 --- !u!114 &4121871349082483632
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,7 +110,7 @@ MonoBehaviour:
   randScaleMax: 0.05
   scaleBump: 0
   coinTossOnScaleMod: 0
-  initialNumber: 10
+  initialNumber: 0
   initialImpulse: 1.25
 --- !u!114 &6030358161095437526
 MonoBehaviour:
@@ -127,15 +125,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxNumber: 1000
---- !u!114 &1122926985408508303
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4121871349082483644}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 751737922f3dc8146806943b3f6216f9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

@@ -1318,6 +1318,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: PlayerCosmeticsOnly
       objectReference: {fileID: 0}
+    - target: {fileID: 7520607732902907942, guid: b823996e71b266945b705fc7eb6971df, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7906427923633295663, guid: b823996e71b266945b705fc7eb6971df, type: 3}
       propertyPath: m_RootOrder
       value: 5

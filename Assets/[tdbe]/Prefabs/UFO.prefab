@@ -194,6 +194,8 @@ GameObject:
   - component: {fileID: 3343969761102376635}
   - component: {fileID: 1467726460470555923}
   - component: {fileID: 3655462724148777929}
+  - component: {fileID: 2299360931498855302}
+  - component: {fileID: -2759983704922182892}
   m_Layer: 15
   m_Name: UFO
   m_TagString: Untagged
@@ -350,6 +352,34 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   warpImmunityPeriod: 0.5
+--- !u!114 &2299360931498855302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998748012411953420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1ffd2d58651cc43a714419d699b924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  info: Stores health and spawn time and time to live. Used by game systems.
+  maxHealth: 1
+  currentHealth: 1
+--- !u!114 &-2759983704922182892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1998748012411953420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6275ad319cc658a4bbc8606ef872a0d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagePerHit: 1
 --- !u!1 &2559692571247355617
 GameObject:
   m_ObjectHideFlags: 0

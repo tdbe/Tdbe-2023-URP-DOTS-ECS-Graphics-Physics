@@ -15,6 +15,8 @@ GameObject:
   - component: {fileID: -5405703995732271580}
   - component: {fileID: 7665899005918751441}
   - component: {fileID: 7956516815164481428}
+  - component: {fileID: 8365520065134655972}
+  - component: {fileID: 5817266337911220797}
   m_Layer: 11
   m_Name: Asteroid
   m_TagString: Untagged
@@ -190,6 +192,34 @@ MonoBehaviour:
   coinTossOnScaleMod: 0
   initialNumber: 0
   initialImpulse: 1.25
+--- !u!114 &8365520065134655972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85503138005864851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6275ad319cc658a4bbc8606ef872a0d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damagePerHit: 1
+--- !u!114 &5817266337911220797
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 85503138005864851}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cd1ffd2d58651cc43a714419d699b924, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  info: Stores health and spawn time and time to live. Used by game systems.
+  maxHealth: 1
+  currentHealth: 1
 --- !u!1 &1956344202431443219
 GameObject:
   m_ObjectHideFlags: 0
