@@ -4,7 +4,7 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 2022.2.6f1
 
 .'s 1.0 sandbox
-- player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups, rocks, ufos+ai, shooting and dying.
+- player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
 
 A fairly wide scope of ECS DAO usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE". Everything is described in code.
