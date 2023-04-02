@@ -16,7 +16,7 @@ The project is set up to be visible via the Hierarchy what is going on and rough
 
 
 Play:
-- Control ship with the input data shown in the Player prefab. By default: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
+- Control ship with the chosen input data keys in the Player prefab. By default: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
 - To easier test, you have 1000 health. You get damaged by 1, every physics tick, by every damage component that is touching you.
 Anything that dies disappears, no animations or menus for now.
 
@@ -49,6 +49,7 @@ Philosophy:
 Some annoying quirks I found:
 - Cross-scene communication techniques in ECS are: *\*crickets\** ..just use statics or somehtin..?
 - Oh what's that you just wanted to quickly access some main Camera data, from your entity subscene? 🙃
+- Yo what's up with Variable Rate Update Groups insta-updating on rate change? It's an interval, not a sometimes-interval..!
 - Some things you don't expect, don't get authored from mono. For example: isKinematic, isTrigger, physics layers.
 - Rigidbody freeze position and rotation does NOT have a solution from Unity in ECS. Yeah there's the external JAC shit but it's not the same behaviour, it's restricting and sometimes unreliable AF joint authoring components.
 - Yes you knew about the renderer and TransformSystemGroup when spawning, but ECS fixed step simulation will also process some collider of an entity at 0,0,0 if you don't use the right command buffer stage. And yeah I know this is per design.
