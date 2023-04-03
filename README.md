@@ -7,9 +7,8 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 - player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
-Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
 ![image](https://user-images.githubusercontent.com/1399607/229584521-0f9c99b9-8741-4711-96c2-e9bd8b3b8a51.png)
-
+Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
 
 A fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE".
 
