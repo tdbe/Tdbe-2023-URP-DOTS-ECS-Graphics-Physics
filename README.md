@@ -6,6 +6,8 @@ Tdbe-2023-DOTS-ECS-Graphics-Physics
 .'s 1.0 sandbox
 - player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
+Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
+
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
 
 
@@ -26,7 +28,7 @@ Some points of interest:
 - I made what I think is a cool multithreaded RandomnessComponent using nativeArray, persistent state, and local plus per-game seeds.
 - simple but reusable Random Spawner aspect, also used in targeted spawning of child rocks.
 - resizeable window / teleport bounds
-- equipped pickups are visible on you and have modding behaviour to you or to what you shoot (e.g. go through objects).
+- equipped pickups are visible on you and have modding behaviour to your health or to your shooting (e.g. go through objects).
 - tweakable health and time to live on *everything that moves* including rocks.
 - tweakable damage dealing from everything that moves.
 - randomized PCG for variable rate update groups, randomized and/or binary sizes as well, for enemies and rocks.
@@ -36,11 +38,12 @@ Some points of interest:
 
 Philosophy:
 - performant (threaded, bursted, instanced, masked) by default, not "well this won't hurt so much".
-- main system can control states of other systems, other systems control their own state and do their one job. (yes there can be sub-branches).
+- main system can update states of other systems, other systems control their own state and do their one job. (and there can be sub-branching).
+- a system changes the component state of something, and then another system takes over. E.g. no scripting of events chains on spawn etc.
 - reuse components, systems, threads, and aspects, unless doing so becomes confusing project-management wise or future-gamedev wise.
-- at the same time, don't split up code that you don't need accessed from anywhere else yet. E.g. you can use "{ }" to separate out blocks without making actual functions that someone else won't know when to use, etc.
+- at the same time, don't split up code that you don't need accessed from anywhere else yet. E.g. you can use "{ }" to separate out blocks locally, without actually moving them out. So you don't end up with confusing modules that someone else won't know when to use, etc.
 - track memory limits, pay attention to what / when you're increasing or destroying; maybe destroy everything in one system at a controlled time.
-- always think about the limits; e.g. is it bad if you wipe out all enemies on the screen at the same time?
+- think about all the limits; e.g. is it bad if you wipe out all enemies on the screen at the same time?
 - use state machines; approaches are described in code (e.g. in GameSystem).
 - maybe break up large components if there is some small part you're writing to a lot.
 - make things clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
@@ -48,11 +51,11 @@ Philosophy:
 
 Some annoying quirks I found:
 - Cross-scene communication techniques in ECS are: *\*crickets\** ..just use statics or somehtin..?
-- Oh what's that you just wanted to quickly access some main Camera data, from your entity subscene? 🙃
-- Yo what's up with Variable Rate Update Groups insta-updating on rate change? It's an interval, not a sometimes-interval..!
+- Oh what's that, you just wanted to quickly access some main Camera data, from your entity subscene? 🙃
+- Yo what's up with Variable Rate Update Groups - insta-updating on rate change? It's an interval, not a sometimes-interval..!
 - Some things you don't expect, don't get authored from mono. For example: isKinematic, isTrigger, physics layers.
-- Rigidbody freeze position and rotation does NOT have a solution from Unity in ECS. Yeah there's the external JAC shit but it's not the same behaviour, it's restricting and sometimes unreliable AF joint authoring components.
-- Yes you knew about the renderer and TransformSystemGroup when spawning, but ECS fixed step simulation will also process some collider of an entity at 0,0,0 if you don't use the right command buffer stage. And yeah I know this is per design.
+- Rigidbody freeze position and rotation does NOT have a solution from Unity in ECS. Yeah there's the external JAC shit but it's not the same behaviour, it's restricting and sometimes physics-unreliable AF joint authoring components.
+- Yes you knew about the renderer and TransformSystemGroup when spawning, but ECS fixed step physics simulation will also process some collider at 0,0,0 of an entity if you don't use the right command buffer stage. And yeah I know this is per design.
 - NonUniformScale component (to be replaced with PostTransformMatrix) is not disabled but actually absent by default, and can be requested / added.
 - Getting collision hit points. I get it, but cumbersome UX...
 
