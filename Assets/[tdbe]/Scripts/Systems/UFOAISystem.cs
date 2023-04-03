@@ -74,6 +74,7 @@ namespace GameWorld.NPCs
                 playerPosArr = playerPosArr,
                 physWorld = physWorld
             }.ScheduleParallel(m_UFOsEQG, state.Dependency);
+            state.Dependency.Complete();
         }
     }
 

@@ -80,6 +80,7 @@ namespace GameWorld.Players
                 targetAreaBL = targetAreaBL,
                 targetAreaTR = targetAreaTR
             }.ScheduleParallel(m_playersEQG, state.Dependency);
+            state.Dependency.Complete();
         }
     }
 

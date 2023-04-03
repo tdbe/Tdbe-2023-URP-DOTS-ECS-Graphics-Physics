@@ -58,7 +58,7 @@ namespace GameWorld
                 ecbp = ecb.AsParallelWriter(),
                 time = SystemAPI.Time.ElapsedTime
             }.ScheduleParallel(spawnerPlayerEQG);
-        
+            state.Dependency.Complete();
             state.Enabled = false;
         }
     }

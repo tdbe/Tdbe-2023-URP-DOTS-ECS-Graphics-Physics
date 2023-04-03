@@ -71,7 +71,7 @@ namespace GameWorld
                 currentTime = Time.timeAsDouble,
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_shieldsEQG, state.Dependency);
-
+            
             // destroy everything in one place :)
             var ecbSingletoEnd = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
             var ecbEnd = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
@@ -139,10 +139,14 @@ namespace GameWorld
 
         public void Execute([ChunkIndexInQuery] int ciqi, 
                             in DeadDestroyTag dedtag, 
-                            in Entity ent)
+                            in Entity ent,
+                            in DynamicBuffer<Child> children)
         {
+            foreach(var child in children)
+            {
+                ecbp.DestroyEntity(ciqi, child.Value);
+            }
             ecbp.DestroyEntity(ciqi, ent);
-            // TODO: go through all references and destroy?
         }
     }
 

@@ -685,11 +685,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5846359511261124064, guid: 06cab492b02005b41be780a5656578b3, type: 3}
       propertyPath: inGameSpawnRate_ms
-      value: 2000
+      value: 2200
       objectReference: {fileID: 0}
     - target: {fileID: 5846359511261124064, guid: 06cab492b02005b41be780a5656578b3, type: 3}
       propertyPath: currentSpawnRate_ms
-      value: 2000
+      value: 2200
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

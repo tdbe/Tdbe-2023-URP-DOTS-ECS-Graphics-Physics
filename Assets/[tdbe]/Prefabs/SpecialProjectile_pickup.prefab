@@ -1609,7 +1609,7 @@ MonoBehaviour:
   activeVisual: {fileID: 4107237136837000114, guid: 505284f62c6026f418f53422f2c8b1a2, type: 3}
   prefab: {fileID: 8971911639874653510, guid: 480dcd8ad616d37469ca73c54335dab9, type: 3}
   timeToLive: 2
-  speed: 400
+  speed: 600
   scale: 2
   pickupTimeToLive: 5
   isCollisionInvulnerable: 1

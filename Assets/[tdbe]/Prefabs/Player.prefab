@@ -1078,8 +1078,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7d29c35a3005035418b76c4a8c7ad318, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  moveSpeed: 1
-  rotateSpeed: 1
+  moveSpeed: 1.5
+  rotateSpeed: 1.5
 --- !u!114 &-4586719085642723876
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1146,7 +1146,7 @@ MonoBehaviour:
   activeVisual: {fileID: 0}
   prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
   timeToLive: 1
-  speed: 400
+  speed: 600
   scale: 1
   pickupTimeToLive: -1
   isCollisionInvulnerable: 0
@@ -1167,7 +1167,7 @@ MonoBehaviour:
   spawnedVisual: {fileID: 0}
   prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
   timeToLive: 1
-  speed: 400
+  speed: 600
   scale: 1
   pickupTime: 0
   pickupTimeToLive: -1

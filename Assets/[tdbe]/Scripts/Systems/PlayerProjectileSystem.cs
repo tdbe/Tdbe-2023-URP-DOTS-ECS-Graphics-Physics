@@ -49,6 +49,7 @@ namespace GameWorld.Players
                 deltaTime = Time.deltaTime,
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_playersEQG, state.Dependency);
+            state.Dependency.Complete();
         }
     }
 
