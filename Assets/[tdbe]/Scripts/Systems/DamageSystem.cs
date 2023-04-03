@@ -13,6 +13,10 @@ using GameWorld.Pickups;
 namespace GameWorld
 {
     
+    // ITriggerEventsJob between Damage components and Health components. 
+    // Two things with those componentsn can damage each other at the same time. 
+    // Also uses Shield and Invulnerable components.
+
     //[UpdateAfter(typeof(GameSystem))]
     //[UpdateAfter(typeof(GameWorld.Asteroid.AsteroidTargetedSpawnerSystem))]
     //[UpdateAfter(typeof(GameWorld.Players.PlayerProjectileSystem))]

@@ -11,7 +11,7 @@ using GameWorld.Players;
 
 namespace GameWorld.Pickups
 {
-    // Collision system that on trigger modifies the data 
+    // Collision system that on trigger modifies the data
     // of colliding EquippedProjectile or EquippedShield components.
     // Actually, I specify players vs pickups, so ufo's won't pick up for now.
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
@@ -180,7 +180,7 @@ namespace GameWorld.Pickups
                 );
                 ecb.AddComponent<DeadDestroyTag>(pickupProjectileEnt);
 
-                // it's very important to avoid duplicates now that we instantiate and whatnot..
+                // especially important to avoid duplicates since we instantiate etc.
                 // so we set this component here immediately (no ecb) and check for it in the beginning of this function.
                 var comp = pickupProjectileTCL[pickupProjectileEnt];
                 comp.active = false;
@@ -226,7 +226,7 @@ namespace GameWorld.Pickups
                 );
                 ecb.AddComponent<DeadDestroyTag>(pickupShieldEnt);
 
-                // it's very important to avoid duplicates now that we instantiate and whatnot..
+                // especially important to avoid duplicates since we instantiate etc.
                 // so we set this component here immediately (no ecb) and check for it in the beginning of this function.
                 var comp = pickupShieldTCL[pickupShieldEnt];
                 comp.active = false;

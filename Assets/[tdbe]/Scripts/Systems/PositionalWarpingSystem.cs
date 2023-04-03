@@ -71,9 +71,7 @@ namespace GameWorld
         // note: PhysicsVelocity or LimitDOFJoint
 
         [BurstCompile]
-        // TODO: Here I have to collect a DynamicBuffer of trigger events here. Because a lot of things can hit the bounds at the same time.
-        // And avoid multiple collisions between the same object and wall, with state awareness.
-        // But also I don't have time right now so let's say this works precise enough. Using time isntead of state.
+        // TODO: might want to actually get collision position
         public void Execute(TriggerEvent triggerEvent)
         {
             Entity entA = triggerEvent.EntityA;

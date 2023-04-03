@@ -13,6 +13,10 @@ using GameWorld.Pickups;
 
 namespace GameWorld
 {
+
+    // checks health of everything not dead, and makes them dead if need be.
+    // checks shield slots and updates shield status or disables the shield.
+    // goes through all dead tags and queues their actual destruction.
     
     //[UpdateAfter(typeof(GameSystem))]
     //[UpdateAfter(typeof(GameWorld.Asteroid.AsteroidTargetedSpawnerSystem))]
@@ -138,7 +142,7 @@ namespace GameWorld
                             in Entity ent)
         {
             ecbp.DestroyEntity(ciqi, ent);
-            // TODO: get all children and destroy -- pickups don't get destroyed.
+            // TODO: go through all references and destroy?
         }
     }
 

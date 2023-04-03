@@ -13,7 +13,8 @@ using GameWorld.Projectiles;
 
 namespace GameWorld.Players
 {
-    
+    // Shoot with current equipped projectile. Or request the destruction 
+    // of currently equipped projectile if it ran out.  
     [UpdateAfter(typeof(GameSystem))]
     [UpdateAfter(typeof(PlayerInputUpdateSystemBase))]
     [BurstCompile]
