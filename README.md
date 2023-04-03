@@ -31,7 +31,7 @@ Some points of interest:
 - tweakable health and time to live on *everything that moves* including rocks.
 - tweakable damage dealing from everything that moves.
 - randomized PCG for variable rate update groups, randomized and/or binary sizes as well, for enemies and rocks.
-- enemy AI follows you through portals (picks shortest path including portals).
+- enemy AI follows closest player, through portals (picks shortest path to nearest player, including portals).
 - Quickly made a dumb but cleverly versatile offsetted outline shadergraph shader that I quickly built all my assets from "CSG style". 
 
 
