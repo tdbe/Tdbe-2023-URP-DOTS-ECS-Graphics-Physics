@@ -99,8 +99,7 @@ namespace GameWorld.Players
                 Entity spawnedProj = ecbp.Instantiate(ciqi, equippedProjectile.prefab);
                 float3 spawnPos = ltrans.Position + ltrans.Up() * 0.5f * ltrans.Scale;
                 ecbp.SetComponent<ProjectileComponent>(ciqi, spawnedProj, new ProjectileComponent{
-                    owner = equippedProjectile.owner,
-                    timeToLive = equippedProjectile.timeToLive
+                    owner = equippedProjectile.owner
                 });
                 ecbp.SetComponent<LocalTransform>(ciqi, spawnedProj, new LocalTransform{
                     Position = spawnPos,

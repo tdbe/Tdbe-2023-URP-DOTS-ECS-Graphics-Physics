@@ -482,9 +482,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbd467602035a8c44b4758ba9edf8e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  info: Stores owner, and time to live.
+  info: Stores owner.
   owner: {fileID: 0}
-  timeToLive: 2000
 --- !u!114 &4840698868045245190
 MonoBehaviour:
   m_ObjectHideFlags: 0

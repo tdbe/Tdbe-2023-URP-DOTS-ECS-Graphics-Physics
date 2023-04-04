@@ -12,7 +12,7 @@ namespace GameWorld
         public readonly Entity entity;
         //private readonly TransformAspect m_transformAspect;
         [Unity.Collections.LowLevel.Unsafe.NativeDisableUnsafePtrRestriction]
-        private readonly RefRO<RandomedSpawningComponent> m_spawnerAspectComponent;
+        private readonly RefRO<RandomedAttributesComponent> m_spawnerAspectComponent;
         public uint initialNumber => m_spawnerAspectComponent.ValueRO.initialNumber;
 
         

@@ -68,7 +68,7 @@ namespace GameWorld.Asteroid
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<RandomedSpawningComponent>();
+            state.RequireForUpdate<RandomedAttributesComponent>();
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
             //state.RequireForUpdate<AsteroidSpawnerStateComponent>();
@@ -220,7 +220,7 @@ namespace GameWorld.Asteroid
         [BurstCompile]
         public void OnCreate(ref SystemState state)
         {
-            state.RequireForUpdate<RandomedSpawningComponent>();
+            state.RequireForUpdate<RandomedAttributesComponent>();
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
             //state.RequireForUpdate<AsteroidSpawnerStateComponent>();

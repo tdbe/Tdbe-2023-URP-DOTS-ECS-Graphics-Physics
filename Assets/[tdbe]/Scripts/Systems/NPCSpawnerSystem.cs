@@ -69,7 +69,7 @@ namespace GameWorld.NPCs
 
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
-            state.RequireForUpdate<RandomedSpawningComponent>();
+            state.RequireForUpdate<RandomedAttributesComponent>();
 
             m_UFOsGroup = state.GetEntityQuery(ComponentType.ReadOnly<UFOComponent>());
 

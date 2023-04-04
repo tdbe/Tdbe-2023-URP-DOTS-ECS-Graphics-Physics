@@ -68,7 +68,7 @@ namespace GameWorld.Pickups
 
             state.RequireForUpdate<PrefabAndParentBufferComponent>();
             state.RequireForUpdate<RandomnessComponent>();
-            state.RequireForUpdate<RandomedSpawningComponent>();
+            state.RequireForUpdate<RandomedAttributesComponent>();
 
             // GetComponentLookup
             //m_allPickups = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp).WithAny<ShieldPickupTag, GunPickupTag>());

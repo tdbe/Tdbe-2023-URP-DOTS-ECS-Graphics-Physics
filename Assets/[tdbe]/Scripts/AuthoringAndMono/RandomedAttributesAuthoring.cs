@@ -3,7 +3,7 @@ using Unity.Entities;
 
 namespace GameWorld
 {
-    public class RandomedSpawningAuthoring : MonoBehaviour
+    public class RandomedAttributesAuthoring : MonoBehaviour
     {
         [Header("Maybe play with +- the depth of spawn.")]
         public float zRange = 0;
@@ -21,11 +21,11 @@ namespace GameWorld
         [Header("Value for an initial impulse force.")]
         public float initialImpulse = 0.05f; 
 
-        public class SpawnerBaker : Baker<RandomedSpawningAuthoring>
+        public class RandomedAttributesBaker : Baker<RandomedAttributesAuthoring>
         {
-            public override void Bake(RandomedSpawningAuthoring authoring)
+            public override void Bake(RandomedAttributesAuthoring authoring)
             {
-                AddComponent<RandomedSpawningComponent>(new RandomedSpawningComponent{
+                AddComponent<RandomedAttributesComponent>(new RandomedAttributesComponent{
                     zRange = authoring.zRange,
                     randScaleMin = authoring.randScaleMin,
                     randScaleMax = authoring.randScaleMax,

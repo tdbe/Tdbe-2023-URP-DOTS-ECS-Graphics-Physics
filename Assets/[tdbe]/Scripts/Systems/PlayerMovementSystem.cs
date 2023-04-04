@@ -30,7 +30,7 @@ namespace GameWorld.Players
             state.RequireForUpdate<PlayerInputComponent>();
             //state.RequireForUpdate<PlayerMovementSystemTag>();
             state.RequireForUpdate<BoundsTagComponent>();// used for teleport spawning, not for movement
-            state.RequireForUpdate<RandomedSpawningComponent>();
+            state.RequireForUpdate<RandomedAttributesComponent>();
             
             m_playersEQG = state.GetEntityQuery(ComponentType.ReadOnly<PlayerComponent>());
             m_boundsGroup = state.GetEntityQuery(ComponentType.ReadOnly<BoundsTagComponent>());

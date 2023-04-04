@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace GameWorld
 {
-    public struct RandomedSpawningComponent : IComponentData
+    public struct RandomedAttributesComponent : IComponentData
     {
         public float zRange;
         public float randScaleMin;
