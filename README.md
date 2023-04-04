@@ -1,9 +1,10 @@
 # Tdbe-2023-DOTS-ECS-Graphics-Physics
-Tdbe-2023-DOTS-ECS-Graphics-Physics
+![image](https://user-images.githubusercontent.com/1399607/229624241-bfa26a77-4a56-41a4-a14a-e5c4d359378e.png)
 
-2022.2.6f1
+v 2022.2.6f1
 
 .'s 1.0 sandbox
+
 - player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
