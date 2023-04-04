@@ -443,21 +443,25 @@ namespace GameWorld.Asteroid
 
         [BurstCompile]
         private void Execute([ChunkIndexInQuery] int ciqi, Entity asteroidEnt, 
-                            in RandomSpawnedSetupAspect spawnAspect, in AsteroidSizeComponent ascomp,
+                            in RandomSpawnedSetupAspect spawnAspect, in AsteroidSizeComponent aSizeComp,
                             in DeadDestroyTag ded, in LocalToWorld ltow)
         {           // this is cool because we can cheaply process all destroyed asteroids in parallel.
-            if(ascomp.childrenToSpawn + existingCount >= spawnCap.maxNumber){
+            if(aSizeComp.childrenToSpawn + existingCount >= spawnCap.maxNumber){
                 //Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
                 return;
             }
             // smallest asteroids die without any spawns
-            if(ascomp.currentSize <= ascomp.minSize){
+            if(aSizeComp.currentSize <= aSizeComp.minSize){
                 return;
             }
             Unity.Mathematics.Random rg = rga[thri];
 
-            float offset = -ascomp.currentSize/2;
-            for(int r = 0; r<ascomp.childrenToSpawn; r++)
+            float aRadius = aSizeComp.currentSize/2;
+            float aRadCubed = aRadius*aRadius*aRadius;
+            float pi43 = 4.1888f;// (4/3*PI)
+            float aVol = pi43 * aRadCubed;
+            float offset = -aRadius;
+            for(int r = 0; r<aSizeComp.childrenToSpawn; r++)
             {                
                 Entity ent = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
 
@@ -466,17 +470,19 @@ namespace GameWorld.Asteroid
                     ltow.Position + new float3(-offset, -offset, 0), 
                     ltow.Position + new float3(offset, offset, 0)
                 );
-                newTransform.Scale = (ascomp.currentSize*math.min(ascomp.childrenToSpawn,1.5f))/ascomp.childrenToSpawn;
+                // actual volue based size calculation, so we can correctly span more than 2 children if we want
+                newTransform.Scale = (aVol/aSizeComp.childrenToSpawn)/pi43;
+                newTransform.Scale = math.pow(newTransform.Scale, 1.0f/3.0f)*2;
                 ecbp.SetComponent<LocalTransform>(ciqi, ent, newTransform);
 
                 // TODO: I'll use physicsVelocity applyImpulse when I get to the Player move forces.
                 ecbp.SetComponent<PhysicsVelocity>(ciqi, ent, spawnAspect.GetPhysicsVelocity(ref rg));
 
                 ecbp.SetComponent<AsteroidSizeComponent>(ciqi, ent, new AsteroidSizeComponent{
-                    defaultSize = ascomp.defaultSize,
+                    defaultSize = aSizeComp.defaultSize,
                     currentSize = newTransform.Scale,
-                    childrenToSpawn = newTransform.Scale <= ascomp.minSize? 0 : ascomp.childrenToSpawn,
-                    minSize = ascomp.minSize
+                    childrenToSpawn = newTransform.Scale <= aSizeComp.minSize? 0 : aSizeComp.childrenToSpawn,
+                    minSize = aSizeComp.minSize
                 });
 
                 if(prefabsAndParents.Length>0){
