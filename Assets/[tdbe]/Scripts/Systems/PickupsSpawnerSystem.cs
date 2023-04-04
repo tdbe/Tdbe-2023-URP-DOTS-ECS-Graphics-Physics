@@ -219,7 +219,7 @@ namespace GameWorld.Pickups
                 ecb.SetComponent<LocalTransform>(ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
                 // I'll use physicsVelocity when I get to the Player move forces.
                 // Actually I do need to set e.g. velocity/mass so it doesn't stop spinning.
-                ecb.SetComponent<PhysicsVelocity>(ent, spawnerAspect.GetPhysicsVelocity());
+                ecb.SetComponent<PhysicsVelocity>(ent, spawnerAspect.GetPhysicsVelocity(float3.zero, new float3(0,1,0)));
 
                 if(prefabsAndParents.Length>which){
                     ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 

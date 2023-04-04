@@ -69,11 +69,12 @@ namespace GameWorld
             // So I imported the [external] Unity_JAC_shit folder for Joint Authoring Components...
         }
 
-        public PhysicsVelocity GetPhysicsVelocity(){
-            float3 dir = new float3(0, 0, 1) * m_spawnerAspectComponent.ValueRO.initialImpulse;
+        public PhysicsVelocity GetPhysicsVelocity(float3 dirPos, float3 dirRot){
+            float3 dirP = dirPos * m_spawnerAspectComponent.ValueRO.initialImpulse;
+            float3 dirR = dirRot * m_spawnerAspectComponent.ValueRO.initialImpulse;
             return new PhysicsVelocity{
-                        Linear = float3.zero,
-                        Angular = dir
+                        Linear = dirP,
+                        Angular = dirR
                     };
         }
 
