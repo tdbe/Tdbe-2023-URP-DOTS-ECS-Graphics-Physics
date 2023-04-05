@@ -47,6 +47,7 @@ Philosophy:
 - use state machines; approaches are described in code (e.g. in GameSystem).
 - maybe break up large components if there is some small part you're writing to a lot.
 - make things clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
+- In ECS anything can be represented as just an efficient database query. So the limits & wisdom are about how you save, define, equip and see this query as a state in a production friendly way.
 
 
 Some annoying quirks I found:
