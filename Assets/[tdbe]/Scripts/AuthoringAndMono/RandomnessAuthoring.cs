@@ -15,7 +15,7 @@ namespace GameWorld
         // Also "Nested native containers are illegal in jobs", but if you just send this native array
         // directly to the job, you get the bonus of being able to write back to it so you save
         // the randomness state.
-        [Header("This is a relative offset, to make each \nrandomness system in the game unique.\nInternally there is another time based offset, \nto make each game unique.")]
+        [Header("Uses Unity.Math.Rand. The seed is a relative offset, \nto make each randomness system in the game unique.\nInternally there is another time based offset, \nto make each game unique.")]
         public uint randomSeed = 1;
 
         public class RandomnessBaker : Baker<RandomnessAuthoring>

@@ -470,7 +470,7 @@ namespace GameWorld.Asteroid
                     ltow.Position + new float3(-offset, -offset, 0), 
                     ltow.Position + new float3(offset, offset, 0)
                 );
-                // actual volue based size calculation, so we can correctly span more than 2 children if we want
+                // actual volue based size calculation, so we can spawn, with correct size, more than 2 children if we want
                 newTransform.Scale = (aVol/aSizeComp.childrenToSpawn)/pi43;
                 newTransform.Scale = math.pow(newTransform.Scale, 1.0f/3.0f)*2;
                 ecbp.SetComponent<LocalTransform>(ciqi, ent, newTransform);

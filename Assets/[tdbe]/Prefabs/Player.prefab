@@ -1165,12 +1165,12 @@ MonoBehaviour:
   active: 1
   owner: {fileID: 7215400412842331241}
   spawnedVisual: {fileID: 0}
-  prefab: {fileID: 3892898844034912754, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+  prefab: {fileID: 0}
   timeToLive: 1
   speed: 600
   scale: 1
   pickupTime: 0
-  pickupTimeToLive: -1
+  pickupTimeToLive: 0
   isCollisionInvulnerable: 0
 --- !u!114 &5288423428541713879
 MonoBehaviour:
@@ -1201,9 +1201,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1ffd2d58651cc43a714419d699b924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  info: Stores health and spawn time and time to live. Used by game systems.
   maxHealth: 1000
   currentHealth: 1000
+  timeToLive: -1
 --- !u!1 &8301162057508823376
 GameObject:
   m_ObjectHideFlags: 0

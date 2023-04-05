@@ -71,6 +71,7 @@ namespace GameWorld
                 currentTime = Time.timeAsDouble,
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_shieldsEQG, state.Dependency);
+            state.Dependency.Complete();
             
             // destroy everything in one place :)
             var ecbSingletoEnd = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
@@ -125,8 +126,8 @@ namespace GameWorld
                     active = false
                 });
 
-                if(equippedShieldComp.spawnedVisual != Entity.Null)
-                    ecbp.AddComponent<DeadDestroyTag>(ciqi, equippedShieldComp.spawnedVisual);
+                if(equippedShieldComp.activeVisual != Entity.Null)
+                    ecbp.AddComponent<DeadDestroyTag>(ciqi, equippedShieldComp.activeVisual);
             }
             
         }

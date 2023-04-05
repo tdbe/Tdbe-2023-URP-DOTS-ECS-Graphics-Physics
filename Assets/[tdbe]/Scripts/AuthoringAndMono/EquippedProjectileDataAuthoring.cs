@@ -5,21 +5,29 @@ namespace GameWorld.Pickups
 {
     public class EquippedProjectileDataAuthoring : MonoBehaviour
     {
-        [Header("This is the pickup data that the Projectile Spawner \nuses to shoot. Obtained from pickups or \nfrom the default 'pickup' on the owner.")]
+        [Header("This is the equipment slot for the pickup data. \nThe Projectile Spawner uses this to shoot. \nStores the data from pickups or \nfrom a default 'pickup' on the owner if available.")]
         public bool active = true;
-        [Header("e.g. player.")]
+        [Header("Owner, e.g. player.")]
         public GameObject owner;
-        [Header("Spawned active visual on owner, e.g. gun.")]
+        [HideInInspector]
+        [Header("Everything below here is automatically fetched from the pickup. \nNormally here I would hide this or have it as a component reference ")]
         public GameObject spawnedVisual;
         [Space]
-        [Header("This is data for the projectile you shoot:")]
+        [HideInInspector]
         public GameObject prefab;
+        [HideInInspector]
         public double timeToLive = 1;
+        [HideInInspector]
         public float speed = 1;
+        [HideInInspector]
         public float scale = 1;
+        [HideInInspector]
         public double pickupTime = 0;
-        public double pickupTimeToLive = 1;// alternativly could count shots as time to live
+        [HideInInspector]
+        public double pickupTimeToLive = 0;// alternativly could count shots as time to live
+        [HideInInspector]
         public bool isCollisionInvulnerable = false;
+
         public class EquippedProjectileDataBaker : Baker<EquippedProjectileDataAuthoring>
         {
             public override void Bake(EquippedProjectileDataAuthoring authoring)
@@ -27,7 +35,7 @@ namespace GameWorld.Pickups
                 AddComponent<EquippedProjectileDataComponent>(new EquippedProjectileDataComponent{
                     active = authoring.active,
                     owner = GetEntity(authoring.owner),
-                    spawnedVisual = GetEntity(authoring.spawnedVisual),
+                    activeVisual = GetEntity(authoring.spawnedVisual),
                     prefab = GetEntity(authoring.prefab),
                     timeToLive = authoring.timeToLive,
                     speed = authoring.speed,

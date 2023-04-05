@@ -8,7 +8,7 @@ namespace GameWorld
 {
     public class RandomnessSingleThreadedAuthoring : MonoBehaviour
     {
-        [Header("This is a relative offset, to make each \nrandomness system in the game unique.\nInternally there is another time based offset, \nto make each game unique.")]
+        [Header("Uses Unity.Math.Rand. The seed is a relative offset, \nto make each randomness system in the game unique.\nInternally there is another time based offset, \nto make each game unique.")]
         public uint randomSeed = 1;
 
         public class RandomnessSingleThreadedBaker : Baker<RandomnessSingleThreadedAuthoring>

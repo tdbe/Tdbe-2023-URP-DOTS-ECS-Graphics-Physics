@@ -158,8 +158,8 @@ namespace GameWorld.Pickups
 
 
                 {
-                    if(equipProjectileComp.spawnedVisual != Entity.Null){
-                        ecb.AddComponent<DeadDestroyTag>(equipProjectileComp.spawnedVisual);
+                    if(equipProjectileComp.activeVisual != Entity.Null){
+                        ecb.AddComponent<DeadDestroyTag>(equipProjectileComp.activeVisual);
                     }
 
                     if(pickupProjectileComp.activeVisual != Entity.Null)
@@ -170,7 +170,7 @@ namespace GameWorld.Pickups
                         ecb.AddComponent<Parent>(prefabInstance, new Parent{
                             Value = equipProjectileEnt
                         });
-                        equipProjectileComp.spawnedVisual = prefabInstance;
+                        equipProjectileComp.activeVisual = prefabInstance;
                     }
                 }
                 
@@ -204,8 +204,8 @@ namespace GameWorld.Pickups
                 equipShieldComp.owner = equipShieldEnt;
 
                 {
-                    if(equipShieldComp.spawnedVisual != Entity.Null){
-                        ecb.AddComponent<DeadDestroyTag>(equipShieldComp.spawnedVisual);
+                    if(equipShieldComp.activeVisual != Entity.Null){
+                        ecb.AddComponent<DeadDestroyTag>(equipShieldComp.activeVisual);
                     }
 
                     if(pickupShieldComp.activeVisual != Entity.Null)
@@ -216,7 +216,7 @@ namespace GameWorld.Pickups
                         ecb.AddComponent<Parent>(prefabInstance, new Parent{
                             Value = equipShieldEnt
                         });
-                        equipShieldComp.spawnedVisual = prefabInstance;
+                        equipShieldComp.activeVisual = prefabInstance;
                     }
                 }
 

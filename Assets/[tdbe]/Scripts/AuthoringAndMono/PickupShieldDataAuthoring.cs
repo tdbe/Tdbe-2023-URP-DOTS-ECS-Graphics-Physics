@@ -9,6 +9,7 @@ namespace GameWorld.Pickups
         public bool active = true;
         public GameObject activeVisual;
         //public double pickupTime = 0;
+        [Header("This is the TTL of this pickup in the owner's equipped pickup slot.")]
         public double pickupTimeToLive = 1;
         public class PickupShieldBaker : Baker<PickupShieldDataAuthoring>
         {

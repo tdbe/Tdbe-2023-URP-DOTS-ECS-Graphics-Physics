@@ -5,14 +5,17 @@ namespace GameWorld.Pickups
 {
     public class EquippedShieldDataAuthoring : MonoBehaviour
     {
-        [Header("This is the shield data that gets read by the system.")]
+        [Header("This is the equipment slot for the pickup data. \nThe Shield pickup data goes in this slot. \nStores the data from pickups or \nfrom a default 'pickup' on the owner if available.")]
         public bool active = false;
-        [Header("e.g. player.")]
+        [Header("Owner, e.g. player.")]
         public GameObject owner;
+        [HideInInspector]
         [Header("Spawned active visual on owner, e.g. gun.")]
-        public GameObject spawnedVisual;
+        public GameObject activeVisual;
+        [HideInInspector]
         public double pickupTime = 0;
-        public double pickupTimeToLive = 1;
+        [HideInInspector]
+        public double pickupTimeToLive = 0;
         
         public class EquippedShieldDataBaker : Baker<EquippedShieldDataAuthoring>
         {
@@ -21,7 +24,7 @@ namespace GameWorld.Pickups
                 AddComponent<EquippedShieldDataComponent>(new EquippedShieldDataComponent{
                     active = authoring.active,
                     owner = GetEntity(authoring.owner),
-                    spawnedVisual = GetEntity(authoring.spawnedVisual),
+                    activeVisual = GetEntity(authoring.activeVisual),
                     pickupTime = authoring.pickupTime,
                     pickupTimeToLive = authoring.pickupTimeToLive
                 });
