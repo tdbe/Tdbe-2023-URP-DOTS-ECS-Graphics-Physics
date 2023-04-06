@@ -344,6 +344,10 @@ PrefabInstance:
       propertyPath: m_LocalScale.z
       value: 0.02304688
       objectReference: {fileID: 0}
+    - target: {fileID: 8792118383438507148, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
+      propertyPath: info
+      value: Stores owner (whom it's shot from).
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 1619054950335495156, guid: b08c9ffb12729104ba3dd6ebf679143b, type: 3}
     m_RemovedGameObjects: []

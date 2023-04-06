@@ -133,6 +133,10 @@ namespace GameWorld
             }
             else if(gameState.state == GameSystemStateComponent.State.Running)
             {
+                // TODO: game should end when:
+                // - there is a moment when there are 0 asteroids and ufos on screen: |Stage Clear|
+                // - you died / all players died: |You Died|
+
                 var ecbSingleton = SystemAPI.GetSingleton<BeginInitializationEntityCommandBufferSystem.Singleton>();
                 var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
                 // update systems states/rates

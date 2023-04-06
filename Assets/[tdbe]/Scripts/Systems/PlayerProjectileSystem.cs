@@ -13,7 +13,7 @@ using GameWorld.Projectiles;
 
 namespace GameWorld.Players
 {
-    // Shoot with current equipped projectile. Or request the expiration / replacement 
+    // Shoot per player with current equipped projectile. Or request the expiration / replacement 
     // of currently equipped projectile if it ran out.  
     [UpdateAfter(typeof(GameSystem))]
     [UpdateAfter(typeof(PlayerInputUpdateSystemBase))]

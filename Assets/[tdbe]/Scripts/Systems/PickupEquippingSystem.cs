@@ -69,7 +69,7 @@ namespace GameWorld.Pickups
             var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            // too many tags...
+            // so many tags...
             m_playersTCL.Update(ref state);
             m_pickupTCL.Update(ref state);
             m_equipProjectileTCL.Update(ref state);
@@ -91,6 +91,7 @@ namespace GameWorld.Pickups
             };
             state.Dependency = jhandle.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
             // X_X singlethreaded physics lookups
+            // NOTE: can do  NativeList<TriggerEvent> and multithread afterwards
         }
 
     }
@@ -254,6 +255,7 @@ namespace GameWorld.Pickups
                     Entity equipShieldEnt = entA;
                     EquippedShieldDataComponent equipShieldComp;
                     equipShieldTCL.TryGetComponent(entA, out equipShieldComp);
+                    ecb.SetComponentEnabled<EquippedShieldDataComponent>(equipShieldEnt, true);
 
                     Entity pickupShieldEnt = entB;
                     PickupShieldDataComponent pickupShieldComp;
@@ -284,6 +286,7 @@ namespace GameWorld.Pickups
                     Entity equipShieldEnt = entB;
                     EquippedShieldDataComponent equipShieldComp;
                     equipShieldTCL.TryGetComponent(entB, out equipShieldComp);
+                    ecb.SetComponentEnabled<EquippedShieldDataComponent>(equipShieldEnt, true);
 
                     Entity pickupShieldEnt = entA;
                     PickupShieldDataComponent pickupShieldComp;

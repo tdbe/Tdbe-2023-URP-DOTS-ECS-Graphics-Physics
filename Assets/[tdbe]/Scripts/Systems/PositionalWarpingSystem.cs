@@ -54,6 +54,7 @@ namespace GameWorld
             };
             state.Dependency = jhandle.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
             // X_X singlethreaded physics lookups
+            // NOTE: can do  NativeList<TriggerEvent> and multithread afterwards
         }
 
     }

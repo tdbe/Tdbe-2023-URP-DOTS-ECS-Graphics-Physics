@@ -17,12 +17,15 @@ namespace GameWorld
     // Two things with those componentsn can damage each other at the same time. 
     // Also uses Shield and Invulnerable components.
 
+    // A more efficient, and networking / movespeed proof way would be to use
+    // prevPos<->currentPos raycasts / spherecasts, and not have colliders on bullets.
+
     //[UpdateAfter(typeof(GameSystem))]
     //[UpdateAfter(typeof(GameWorld.Asteroid.AsteroidTargetedSpawnerSystem))]
     //[UpdateAfter(typeof(GameWorld.Players.PlayerProjectileSystem))]
     //
     //[UpdateBefore(typeof(HealthSystem))]
-    [UpdateInGroup(typeof(LateSimulationSystemGroup))]
+    [UpdateInGroup(typeof(SimulationSystemGroup))]
     [BurstCompile]
     public partial struct  DamageSystem : ISystem
     {
@@ -108,7 +111,9 @@ namespace GameWorld
             // NOTE: this applies damage every collision hit.
             // Which is far from perfect in any more advanced game.
 
-            // TODO: check if player, say YOU DIED etc.
+            // NOTE: also you probably want raycasts/spherecasts and no colliders on bullets.
+
+            // TODO: somewhere check player health, say YOU DIED etc.
 
             if(isDamagerA && isHealthB)
             {

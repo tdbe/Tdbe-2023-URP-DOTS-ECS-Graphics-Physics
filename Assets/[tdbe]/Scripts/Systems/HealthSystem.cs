@@ -17,6 +17,8 @@ namespace GameWorld
     // checks health of everything not dead, and makes them dead if need be.
     // checks shield slots and updates shield status or disables the shield.
     // goes through all dead tags and queues their actual destruction.
+
+    // so it's technically 3 related systems in one, but I had no need rn to split
     
     //[UpdateAfter(typeof(GameSystem))]
     //[UpdateAfter(typeof(GameWorld.Asteroid.AsteroidTargetedSpawnerSystem))]
@@ -55,32 +57,35 @@ namespace GameWorld
         {
             var ecbSingleton = SystemAPI.GetSingleton<BeginSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
+            var ecbSingletonEnd = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
+            var ecbEnd = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
 
-            // TODO: if I need custom systems/jobs, use writegroups for health stuff
+            // TODO: if I need varied custom systems/jobs, use writegroups for health stuff
 
             state.Dependency = new CheckHealthJob
             {
                 currentTime = Time.timeAsDouble,
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_healthEQG_notded, state.Dependency);
-            
-            // TODO: this one needs to be optimized and synced better
             state.Dependency.Complete();
+            
+            // this one will only run on entities with equipped shield slot components which are not disabled.
             state.Dependency = new CheckShieldsJob
             {
                 currentTime = Time.timeAsDouble,
                 ecbp = ecb.AsParallelWriter(),
             }.ScheduleParallel(m_shieldsEQG, state.Dependency);
             state.Dependency.Complete();
-            
+
             // destroy everything in one place :)
-            var ecbSingletoEnd = SystemAPI.GetSingleton<EndSimulationEntityCommandBufferSystem.Singleton>();
-            var ecbEnd = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             state.Dependency = new DeadDestroyJob
             {
                 ecbp = ecbEnd.AsParallelWriter(),
             }.ScheduleParallel(m_DeadDestroyEQG, state.Dependency);
             state.Dependency.Complete();
+            // NOTE: ^ we don't -have to- complete these jobs this update stage frame, 
+            // if it's not enough time, we can store the job handle and force completion
+            // next time we need another one created.
         }
     }
 
@@ -117,7 +122,7 @@ namespace GameWorld
                             in EquippedShieldDataComponent equippedShieldComp, 
                             in Entity ent)
         {
-            // TODO: maybe ISharedComponent based on equippedShieldComp.active?
+            // ISharedComponent would be unnecessarily expensive
             if( equippedShieldComp.active &&
                 equippedShieldComp.pickupTime + equippedShieldComp.pickupTimeToLive
                 < currentTime 
@@ -125,7 +130,10 @@ namespace GameWorld
                 ecbp.SetComponent<EquippedShieldDataComponent>(ciqi, ent, new EquippedShieldDataComponent{
                     active = false
                 });
+                // disable this component so it won't waste thread resources
+                ecbp.SetComponentEnabled<EquippedShieldDataComponent>(ciqi, ent, false);
 
+                // destroy shield visual on owner if one exists
                 if(equippedShieldComp.activeVisual != Entity.Null)
                     ecbp.AddComponent<DeadDestroyTag>(ciqi, equippedShieldComp.activeVisual);
             }

@@ -514,7 +514,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cbd467602035a8c44b4758ba9edf8e2a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  info: Stores owner.
+  info: Stores owner (whom it's shot from).
   owner: {fileID: 0}
 --- !u!114 &4840698868045245190
 MonoBehaviour:
@@ -541,9 +541,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cd1ffd2d58651cc43a714419d699b924, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  info: Stores health and spawn time and time to live. Used by game systems.
   maxHealth: 1
   currentHealth: 1
+  timeToLive: -1
 --- !u!1 &8679236359663512800
 GameObject:
   m_ObjectHideFlags: 0

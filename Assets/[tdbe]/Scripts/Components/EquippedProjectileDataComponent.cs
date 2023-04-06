@@ -2,7 +2,7 @@ using Unity.Entities;
 
 namespace GameWorld.Pickups
 {
-    public struct EquippedProjectileDataComponent : IComponentData
+    public struct EquippedProjectileDataComponent : IComponentData, IEnableableComponent
     {
         public bool active;
         public Entity owner;

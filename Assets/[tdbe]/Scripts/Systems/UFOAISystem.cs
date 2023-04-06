@@ -48,7 +48,7 @@ namespace GameWorld.NPCs
         {
 
             // The smart thing to do here would be to have a job that takes all players
-            // and inserts them into some kind of partitioning tree or hash map.
+            // and inserts them into some kind of AABB / partitioning tree or hash map.
             // Then in the ufo move job, fetch the closest player to the ufo's position.
 
             // But since we have portals, and I don't have time,

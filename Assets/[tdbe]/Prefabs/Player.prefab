@@ -1186,7 +1186,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   active: 0
   owner: {fileID: 7215400412842331241}
-  spawnedVisual: {fileID: 0}
+  activeVisual: {fileID: 0}
   pickupTime: 0
   pickupTimeToLive: 0
 --- !u!114 &-4905520071654626234

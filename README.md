@@ -5,34 +5,36 @@ v 2022.2.6f1
 
 .'s 1.0 sandbox
 
-- player, game system, states, random/spawners, variable rates, threads, aspects, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
+- everything is unmanaged, bursted, and (multi)threaded by default (except the legacy input)
+- player, game system, states, random/spawners, variable rates, threads, aspects, dynamic buffers & nativearray components, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
+
 
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
 ![image](https://user-images.githubusercontent.com/1399607/229584521-0f9c99b9-8741-4711-96c2-e9bd8b3b8a51.png)
 Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
 
-A fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop; all approaches performant and threaded by default. There are still a few details done in a hurry, marked with "// TODO:" or "// NOTE".
+Fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop. There are still a few gameplay details done in a hurry, marked with "// TODO:" or "// NOTE".
 
 
-The project is set up to be visible via the Hierarchy what is going on and roughly in what order, and using prefabs and components with mono authorings, and inspector notes. Most things are also described in comments in code.
+The project is set up to be visible via the Hierarchy what is going on and roughly in what order, and using prefabs and components with mono authorings, and inspector notes. Most things & rationales are also described in comments in code.
 
 
 Play:
 - Control ship with the chosen input data keys in the Player prefab. By default: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
 - To easier test, you have 1000 health. You get damaged by 1, every physics tick, by every damage component that is touching you.
-Anything that dies disappears, no animations or menus for now.
+Anything that dies disappears, no animations or GUI for now.
 
 
 Some points of interest:
-- Everything is physics based.
+- everything is physics based.
 - I made what I think is a cool multithreaded RandomnessComponent using nativeArray, persistent state, and local plus per-game seeds.
-- simple but reusable Random Spawner aspect, also used in targeted spawning of child rocks.
+- simple but reusable Random Spawner aspect, also reused in targeted spawning of child rocks and player teleportation.
 - resizeable window / teleport bounds
 - equipped pickups are visible on you and have modding behaviour to your health or to your shooting (e.g. go through objects).
 - tweakable health and time to live on *everything that moves* including rocks.
 - tweakable damage dealing from everything that moves.
-- randomized PCG for variable rate update groups, randomized and/or binary sizes as well, for enemies and rocks.
-- enemy AI follows closest player, through portals (picks shortest path to nearest player, including portals).
+- randomized PCG for variable rate update groups, randomized (and/or binary) sizes as well, for enemies and rocks.
+- enemy AI follows closest player, even through portals (picks shortest path to nearest player, including portals).
 - Quickly made a dumb but cleverly versatile offsetted outline shadergraph shader that I quickly built all my assets from "CSG style". 
 
 

@@ -6,7 +6,7 @@ namespace GameWorld.Projectiles
     public class ProjectileAuthoring : MonoBehaviour
     {
         [TextArea(1,3)]
-        public string info = "Stores owner.";
+        public string info = "Stores owner (whom it's shot from).";
         [HideInInspector]
         public GameObject owner;
         //[HideInInspector]
