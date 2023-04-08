@@ -18,9 +18,12 @@ Fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a ful
 
 The project is set up to be visible via the Hierarchy what is going on and roughly in what order, and using prefabs and components with mono authorings, and inspector notes. Most things & rationales are also described in comments in code.
 
+Assets\[tdbe]\Scenes\GameScene_01 <-- scene to play
 
 Play:
-- Control ship with the chosen input data keys in the Player prefab. By default: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
+- Control ship with the chosen input data keys in the corresponding Player prefab. By default: 
+  - Player_1: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
+  - Player_2: WASD to move, Space to shoot, leftShift to teleport.
 - To easier test, you have 1000 health. You get damaged by 1, every physics tick, by every damage component that is touching you.
 Anything that dies disappears, no animations or GUI for now.
 
