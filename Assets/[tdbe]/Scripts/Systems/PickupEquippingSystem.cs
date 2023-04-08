@@ -11,9 +11,10 @@ using GameWorld.Players;
 
 namespace GameWorld.Pickups
 {
-    // Collision system that on trigger modifies the data
+    // Collision system PlayerComponent / UFO? <-> PickupTag that 
+    // on trigger modifies the data
     // of colliding EquippedProjectile or EquippedShield components.
-    // Actually, I specify players vs pickups, so ufo's won't pick up for now.
+    // Ufo's could also consume pickups: add equip slot and add ufo trigger component.
     [UpdateInGroup(typeof(FixedStepSimulationSystemGroup))]
     [UpdateAfter(typeof(PhysicsSystemGroup))]
     [BurstCompile]
@@ -97,7 +98,9 @@ namespace GameWorld.Pickups
     }
 
     // Here we take the data from the pickup and populate the Equip component on 
-    // whoever has it and collided with the pickup
+    // whoever has it and collided with the pickup.
+    // We're not really planning to do a lot of work here, but if we need multithreading, 
+    // we can export the collisions into a NativeList<TriggerEvent>, and return them and pass them to a parallel thread.
     [BurstCompile]
     public partial struct EquippablePickupJob:ITriggerEventsJob
     {

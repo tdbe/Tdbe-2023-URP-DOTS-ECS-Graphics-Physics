@@ -15,6 +15,8 @@ namespace GameWorld.Players
 {
     // Shoot per player with current equipped projectile. Or request the expiration / replacement 
     // of currently equipped projectile if it ran out.  
+    // Only handles shooting, with player input. Does not care about what your projectile hit etc., that's the DamageSystem.
+    // Projectiles know their owner, so we could have score etc.
     [UpdateAfter(typeof(GameSystem))]
     [UpdateAfter(typeof(PlayerInputUpdateSystemBase))]
     [BurstCompile]

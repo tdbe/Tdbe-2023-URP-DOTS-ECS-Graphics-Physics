@@ -8,6 +8,8 @@ using UnityEngine;
 using Unity.Physics;
 //using Unity.Physics.Extensions;
 
+using Unity.Jobs;
+
 namespace GameWorld.Asteroid
 {
     public class AsteroidSpawnerVRUpdateGroup:ComponentSystemGroup
@@ -35,7 +37,6 @@ namespace GameWorld.Asteroid
     {
         private EntityQuery m_asteroidsGroup;
         private EntityQuery m_boundsGroup;
-        private EntityQuery m_sysSelfEQG;  
 
         // Need to set variable rate from other systems
         public void SetNewRate(ref SystemState state)
@@ -74,7 +75,6 @@ namespace GameWorld.Asteroid
             //state.RequireForUpdate<AsteroidSpawnerStateComponent>();
             state.RequireForUpdate<AsteroidVRSpawnerTag>();
             
-            m_sysSelfEQG = state.GetEntityQuery(ComponentType.ReadOnly<AsteroidVRSpawnerTag>());
             m_asteroidsGroup = state.GetEntityQuery(ComponentType.ReadOnly<AsteroidSizeComponent>());
 
             state.RequireForUpdate<BoundsTagComponent>();
@@ -120,8 +120,7 @@ namespace GameWorld.Asteroid
             
             if(spawnerState == AsteroidSpawnerStateComponent.State.InitialSpawn)
             {
-                spawnAmount = spawnAspect.initialNumber;
-                GetCorners2(ref state, m_boundsGroup.ToEntityArray(Allocator.Temp), out targetAreaBL, out targetAreaTR);
+                return;
             }
             else if(spawnerState == AsteroidSpawnerStateComponent.State.InGameSpawn)
             {
@@ -137,14 +136,15 @@ namespace GameWorld.Asteroid
             var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
             var jhandle = new AsteroidSpawnerJob
             {
-                ecb = ecb,
-                spawnAmount = spawnAmount,
+                ecbp = ecb.AsParallelWriter(),
                 targetAreaBL = targetAreaBL,
                 targetAreaTR = targetAreaTR,
                 existingCount = existingCount,
                 rga = rga,
-                prefabsAndParents = prefabsAndParents
-            }.Schedule(m_sysSelfEQG, state.Dependency);
+                prefabsAndParents = prefabsAndParents,
+                spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt),
+                spawnAspect = SystemAPI.GetAspectRO<RandomSpawnedSetupAspect>(stateCompEnt)
+            }.Schedule((int)spawnAmount, 1, state.Dependency);
 
             jhandle.Complete();
             //ecb.DestroyEntity(asteroidSpawnAspect.asteroidPrefab);
@@ -200,7 +200,6 @@ namespace GameWorld.Asteroid
         private EntityQuery m_liveAsteroidsGroup;
         private EntityQuery m_dedAsteroidsGroup;
         private EntityQuery m_boundsGroup;
-        private EntityQuery m_sysSelfEQG;
 
         public void SetNewState(ref SystemState state, AsteroidSpawnerStateComponent.State newState)
         {
@@ -225,8 +224,6 @@ namespace GameWorld.Asteroid
             state.RequireForUpdate<RandomnessComponent>();
             //state.RequireForUpdate<AsteroidSpawnerStateComponent>();
             state.RequireForUpdate<AsteroidTargetedSpawnerTag>();
-
-            m_sysSelfEQG = state.GetEntityQuery(ComponentType.ReadOnly<AsteroidVRSpawnerTag>());
 
             m_liveAsteroidsGroup = state.GetEntityQuery(new EntityQueryBuilder(Allocator.Temp)
                 .WithAll<AsteroidSizeComponent>()
@@ -288,14 +285,16 @@ namespace GameWorld.Asteroid
             var prefabsAndParents = SystemAPI.GetBuffer<PrefabAndParentBufferComponent>(stateCompEnt);
             var jhandle = new AsteroidSpawnerJob
             {
-                ecb = ecb,
-                spawnAmount = spawnAmount,
+                ecbp = ecb.AsParallelWriter(),
                 targetAreaBL = targetAreaBL,
                 targetAreaTR = targetAreaTR,
                 existingCount = existingCount,
                 rga = rga,
-                prefabsAndParents = prefabsAndParents
-            }.Schedule(m_sysSelfEQG, state.Dependency);
+                prefabsAndParents = prefabsAndParents,
+                spawnCap = SystemAPI.GetComponent<SpawnCapComponent>(stateCompEnt),
+                spawnAspect = SystemAPI.GetAspectRO<RandomSpawnedSetupAspect>(stateCompEnt)
+
+            }.Schedule((int)spawnAmount, 1, state.Dependency);
 
             jhandle.Complete();
             //ecb.DestroyEntity(asteroidSpawnAspect.asteroidPrefab);
@@ -371,15 +370,13 @@ namespace GameWorld.Asteroid
         }
     }
 
-    // A generic spawning job over a random area + velocity, doesn't have to be used just by asteroid spawner..
+    // A generic spawning job over a random area + velocity, doesn't have to be used just by asteroid spawner.
     [BurstCompile]
-    public partial struct AsteroidSpawnerJob:IJobEntity
+    public partial struct AsteroidSpawnerJob:IJobParallelFor
     {
         [Unity.Collections.LowLevel.Unsafe.NativeSetThreadIndex]
         private int thri;
-        public EntityCommandBuffer ecb;
-        [ReadOnly]
-        public uint spawnAmount;
+        public EntityCommandBuffer.ParallelWriter ecbp;
         [ReadOnly]
         public int existingCount;
         [ReadOnly]
@@ -391,28 +388,32 @@ namespace GameWorld.Asteroid
         public NativeArray<Unity.Mathematics.Random> rga;
         [ReadOnly]
         public DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents;
+        [ReadOnly]
+        public RandomSpawnedSetupAspect spawnAspect;
+        [ReadOnly]
+        public SpawnCapComponent spawnCap;
 
-        // TODO: maybe do parallel spawning, like this: ecb.parallelwriter, a pre-spawned query of entities to send to this parallel thread, and here add components to each in parallel
         // IJobParallelFor
         [BurstCompile]
-        private void Execute(in RandomSpawnedSetupAspect spawnAspect, in SpawnCapComponent spawnCap)
+        public void Execute(int parfi)
         {
             Unity.Mathematics.Random rg = rga[thri];
-            for(uint i = 0; i < spawnAmount; i++){
+            int i = parfi;
+            {
                 if(i + existingCount > spawnCap.maxNumber){
                     //Debug.LogWarning("[AsteroidSpawner][RandomSpawn] Reached max number of spawned asteroids! ");
-                    break;
+                    return;
                 }
-                Entity ent = ecb.Instantiate(prefabsAndParents[0].prefab);
+                Entity ent = ecbp.Instantiate(parfi, prefabsAndParents[0].prefab);
 
                 // TODO: do a spherecast loop to make sure we're not spawning an asteroid on a player
                 LocalTransform newTransform = spawnAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR);
-                ecb.SetComponent<LocalTransform>(ent, newTransform);
+                ecbp.SetComponent<LocalTransform>(parfi, ent, newTransform);
                 // TODO: I'll use physicsVelocity applyImpulse when I get to the Player move forces.
-                ecb.SetComponent<PhysicsVelocity>(ent, spawnAspect.GetPhysicsVelocity(ref rg));
+                ecbp.SetComponent<PhysicsVelocity>(parfi, ent, spawnAspect.GetPhysicsVelocity(ref rg));
 
                 if(prefabsAndParents.Length>0){
-                    ecb.AddComponent<Unity.Transforms.Parent>(ent, new Unity.Transforms.Parent{ 
+                    ecbp.AddComponent<Unity.Transforms.Parent>(parfi, ent, new Unity.Transforms.Parent{ 
                             Value = prefabsAndParents[0].parent
                     });
                 }

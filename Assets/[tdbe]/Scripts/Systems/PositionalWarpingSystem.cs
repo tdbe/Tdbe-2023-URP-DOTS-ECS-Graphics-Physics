@@ -6,6 +6,7 @@ using Unity.Collections;
 using Unity.Transforms;
 using Unity.Mathematics;
 using UnityEngine;
+using Unity.Jobs;
 
 namespace GameWorld
 {
@@ -38,43 +39,72 @@ namespace GameWorld
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
+            state.Dependency.Complete();// make sure previous jobs on this, have finished.
+            NativeList<TriggerEvent> warpTriggerEvents = new NativeList<TriggerEvent>(Allocator.TempJob);
+            var jhandle1 = new PositionalWarpingTriggerCollectorJob
+            {
+                warpTriggerEvents = warpTriggerEvents
+            };
+            state.Dependency = jhandle1.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
+            // X_X singlethreaded physics lookups, so:
+            // NOTE: to multithread the calculations, I'm using NativeList<TriggerEvent> ^ and multithreading below
+            state.Dependency.Complete();
+
             // EndSimulationEntityCommandBufferSystem
             var ecbSingleton = SystemAPI.GetSingleton<EndFixedStepSimulationEntityCommandBufferSystem.Singleton>();
             var ecb = ecbSingleton.CreateCommandBuffer(state.WorldUnmanaged);
             m_boundsTCL.Update(ref state);
             m_warpableTCL.Update(ref state);
             m_ltransTCL.Update(ref state);
-            var jhandle = new PositionalWarpingJob
+            var jhandle2 = new PositionalWarpingJob
             {
-                ecb = ecb,
+                ecbp = ecb.AsParallelWriter(),
                 time = SystemAPI.Time.ElapsedTime,
                 boundsTagComponent = m_boundsTCL,
                 warpableTagComponent = m_warpableTCL,
-                localTransformComponent = m_ltransTCL
+                localTransformComponent = m_ltransTCL,
+                warpTriggerEvents = warpTriggerEvents
             };
-            state.Dependency = jhandle.Schedule(SystemAPI.GetSingleton<SimulationSingleton>(), state.Dependency);
-            // X_X singlethreaded physics lookups
-            // NOTE: can do  NativeList<TriggerEvent> and multithread afterwards
+            state.Dependency = jhandle2.Schedule(warpTriggerEvents.Length, 1, state.Dependency);
         }
 
     }
 
     [BurstCompile]
-    public partial struct PositionalWarpingJob:ITriggerEventsJob
+    public partial struct PositionalWarpingTriggerCollectorJob:ITriggerEventsJob
     {
-        public EntityCommandBuffer ecb;
-        [ReadOnly]
-        public double time;
-        [ReadOnly]
-        public ComponentLookup<BoundsTagComponent> boundsTagComponent;
-        public ComponentLookup<WarpableTag> warpableTagComponent;
-        public ComponentLookup<LocalTransform> localTransformComponent;
-        // note: PhysicsVelocity or LimitDOFJoint
+        public NativeList<TriggerEvent> warpTriggerEvents;
 
         [BurstCompile]
         // TODO: might want to actually get collision position
         public void Execute(TriggerEvent triggerEvent)
         {
+            warpTriggerEvents.Add(triggerEvent);
+        }
+    }
+
+    [BurstCompile]
+    public partial struct PositionalWarpingJob:IJobParallelFor
+    {
+        public EntityCommandBuffer.ParallelWriter ecbp;
+        [ReadOnly]
+        public double time;
+        [ReadOnly]
+        public ComponentLookup<BoundsTagComponent> boundsTagComponent;
+        [ReadOnly]
+        public ComponentLookup<WarpableTag> warpableTagComponent;
+        [ReadOnly]
+        public ComponentLookup<LocalTransform> localTransformComponent;
+        // note: PhysicsVelocity or LimitDOFJoint
+
+        [ReadOnly]
+        public NativeList<TriggerEvent> warpTriggerEvents;
+
+        [BurstCompile]
+        // TODO: might want to actually get collision position
+        public void Execute(int parfi)
+        {
+            var triggerEvent = warpTriggerEvents[parfi];
             Entity entA = triggerEvent.EntityA;
             Entity entB = triggerEvent.EntityB;
 
@@ -94,7 +124,7 @@ namespace GameWorld
             warpableTagComponent.TryGetComponent(warpableEnt, out warpableTag);
             if(time - warpableTag.lastWarpTime > warpableTag.warpImmunityPeriod)
             {
-                ecb.SetComponent<WarpableTag>(warpableEnt, new WarpableTag{warpImmunityPeriod = warpableTag.warpImmunityPeriod, lastWarpTime = time});
+                ecbp.SetComponent<WarpableTag>(parfi, warpableEnt, new WarpableTag{warpImmunityPeriod = warpableTag.warpImmunityPeriod, lastWarpTime = time});
                 
                 Entity boundsEnt = isBoundsA? entA : entB;    
                 
@@ -106,7 +136,7 @@ namespace GameWorld
                 float3 dirToCenter = math.normalize(newTransform.Position);
                 newTransform.Position = -newTransform.Position;
                 newTransform.Position += dirToCenter*1.2f;// obviously this is also a hack, and doesn't even check the warpable's collider radius..
-                ecb.SetComponent<LocalTransform>(warpableEnt, newTransform);
+                ecbp.SetComponent<LocalTransform>(parfi, warpableEnt, newTransform);
             }
         }
     }

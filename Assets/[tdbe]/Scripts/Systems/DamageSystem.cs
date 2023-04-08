@@ -113,7 +113,7 @@ namespace GameWorld
 
             // NOTE: also you probably want raycasts/spherecasts and no colliders on bullets.
 
-            // TODO: somewhere check player health, say YOU DIED etc.
+            // TODO: somewhere check player health to say YOU DIED etc.
 
             if(isDamagerA && isHealthB)
             {
@@ -129,7 +129,7 @@ namespace GameWorld
                     bool hasShield = shieldsTCL.TryGetComponent(entB, out shieldComp);
                     
                     if(hasShield && shieldComp.active){
-                        // TODO: maybe have the shield go down?
+                        // TODO: maybe queue the shield to go down?
                         // Right now shield also practially means invulnerable for x seconds.
                     }
                     else
@@ -154,7 +154,7 @@ namespace GameWorld
                     bool hasShield = shieldsTCL.TryGetComponent(entA, out shieldComp);
                     
                     if(hasShield && shieldComp.active){
-                        // TODO: maybe have the shield go down?
+                        // TODO: maybe queue the shield to go down?
                         // Right now shield also practially means invulnerable for x seconds.
                     }
                     else
