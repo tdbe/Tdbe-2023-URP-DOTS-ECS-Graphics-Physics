@@ -72,21 +72,16 @@ namespace GameWorld
         private void Execute([ChunkIndexInQuery] int ciqi, in DynamicBuffer<PrefabAndParentBufferComponent> prefabsAndParents, in SimpleSpawnerComponent spawnerComp)
         {
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
-            for(uint i = 0; i < spawnerComp.spawnNumber; i++){
-                Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
+            for(uint i = 0; i < spawnerComp.spawnNumber; i++)
+            {
+                for(int j = 0; j< prefabsAndParents.Length; j++)
+                {
+                    Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[j].prefab);
 
-                if(prefabsAndParents.Length>0){
                     ecbp.AddComponent<Unity.Transforms.Parent>(ciqi, prefabInstance, new Unity.Transforms.Parent{ 
-                        Value = prefabsAndParents[0].parent
+                        Value = prefabsAndParents[j].parent
                     });
                 }
-
-                ecbp.AddComponent<LocalTransform>(ciqi, prefabInstance, 
-                    new LocalTransform{ 
-                        Position = float3.zero,
-                        Rotation = quaternion.identity,
-                        Scale = 1
-                    });
             }
             //ecbp.DestroyEntity(ciqi, prefabsAndParents[0].prefab);     
             //spawnerCompArr.Dispose();
@@ -106,27 +101,34 @@ namespace GameWorld
             //var spawnerCompArr = spawnerEQG.ToEntityArray(Allocator.Temp);
             for(uint i = 0; i < spawnerComp.spawnNumber; i++)
             {
-                // TODO: spherecast in a (finite) loop for empty random places to spawn.
-                // (no asteroids or ufos)
-                Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[0].prefab);
+                for(int j = 0; j< prefabsAndParents.Length; j++)
+                {
+                    // TODO: spherecast in a (finite) loop for empty random places to spawn.
+                    // (no asteroids or ufos)
+                    Entity prefabInstance = ecbp.Instantiate(ciqi, prefabsAndParents[j].prefab);
 
-                ecbp.AddComponent<PhysicsVelocity>(ciqi, prefabInstance, new PhysicsVelocity());
-                ecbp.AddComponent<PhysicsMass>(ciqi, prefabInstance, 
-                    PhysicsMass.CreateDynamic(MassProperties.UnitSphere, 1)
-                );
-     
-                ecbp.AddComponent<SpawnTimeComponent>(ciqi, prefabInstance, new SpawnTimeComponent{
-                    spawnTime = time
-                });
-
-                if(prefabsAndParents.Length>0){
+                    ecbp.AddComponent<PhysicsVelocity>(ciqi, prefabInstance, new PhysicsVelocity());
+                    ecbp.AddComponent<PhysicsMass>(ciqi, prefabInstance, 
+                        PhysicsMass.CreateDynamic(MassProperties.UnitSphere, 1)
+                    );
+        
+                    ecbp.AddComponent<SpawnTimeComponent>(ciqi, prefabInstance, new SpawnTimeComponent{
+                        spawnTime = time
+                    });
+ 
                     ecbp.AddComponent<Unity.Transforms.Parent>(ciqi, prefabInstance, new Unity.Transforms.Parent{ 
-                        Value = prefabsAndParents[0].parent
+                        Value = prefabsAndParents[j].parent
                     });
                 }
             }
-            if(prefabsAndParents[0].prefab != Entity.Null)
-                ecbp.AddComponent<DeadDestroyTag>(ciqi, prefabsAndParents[0].prefab);     
+
+
+            for(int j = 0; j< prefabsAndParents.Length; j++)
+            {
+                if(prefabsAndParents[j].prefab != Entity.Null)
+                    ecbp.AddComponent<DeadDestroyTag>(ciqi, prefabsAndParents[j].prefab);     
+            }
+            
             //spawnerCompArr.Dispose();
         }
     }
