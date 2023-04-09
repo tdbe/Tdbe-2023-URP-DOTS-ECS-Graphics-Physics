@@ -32,7 +32,7 @@ Assets\[tdbe]\Scenes\GameScene_01 <-- scene to play
   - Player_1: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
   - Player_2: WASD to move, Space to shoot, leftShift to teleport.
 - To easier test, you have 1000 health. You get damaged by 1, every physics tick, by every damage component that is touching you.
-Anything that dies disappears, no animations or GUI for now.
+Anything that dies disappears, no animations, but there is health GUI.
 
 
 ### Some points of interest:
