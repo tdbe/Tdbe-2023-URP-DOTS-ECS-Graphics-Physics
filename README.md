@@ -8,12 +8,12 @@ v 2022.2.6f1
 - everything is unmanaged, bursted, and (multi)threaded by default (except the legacy input)
 - player, game system, states, random/spawners, variable rates, threads, aspects, dynamic buffers & nativearray components, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
-5-8 ms on main thread, and 140-190FPS, with 500k-1m triangles
 
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
 ![stats1](https://user-images.githubusercontent.com/1399607/230787051-743b08a1-a4f0-4d21-baec-015b44767a75.PNG)
+- 5-8 ms on main thread, and 140-190FPS, with 500k-1m triangles
 ![image](https://user-images.githubusercontent.com/1399607/229584521-0f9c99b9-8741-4711-96c2-e9bd8b3b8a51.png)
-Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
+- Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
 
 Fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop. There are still a few gameplay details done in a hurry, marked with "// TODO:" or "// NOTE".
 
@@ -69,4 +69,3 @@ Some annoying quirks I found:
 
 
 ![image](https://user-images.githubusercontent.com/1399607/228077452-9fc860c3-e4eb-4a14-a27d-3230db34fdf4.png)
-![image](https://user-images.githubusercontent.com/1399607/228080576-c4664bf1-46d0-47a9-adca-17458bbd6c09.png)
