@@ -62,7 +62,7 @@ Some annoying quirks I found:
 - Some things you don't expect, don't get authored from mono. For example: isKinematic, isTrigger, physics layers.
 - Rigidbody freeze position and rotation does NOT have a solution from Unity in ECS. Yeah there's the external JAC shit but it's not the same behaviour, it's restricting and sometimes physics-unreliable AF joint authoring components.
 - Yes you knew about the renderer and TransformSystemGroup when spawning, but ECS fixed step physics simulation will also process some collider at 0,0,0 of an entity if you don't use the right command buffer stage. And yeah I know this is per design.
-- NonUniformScale component (to be replaced with PostTransformMatrix) is not disabled but actually absent by default, and can be requested / added.
+- NonUniformScale/PostTransformScale component (to be replaced with PostTransformMatrix) is not disabled but actually absent by default, and can be requested / added.
 - Getting collision hit points. I get it, but cumbersome UX...
 
 
