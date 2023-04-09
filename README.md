@@ -3,21 +3,22 @@
 
 v 2022.2.6f1
 
-.'s 1.0 sandbox
+## .'s 1.0 sandbox
 
 - everything is unmanaged, bursted, and (multi)threaded by default (except the legacy input)
 - player, game system, states, random/spawners, variable rates, threads, aspects, dynamic buffers & nativearray components, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
 
-
 ![image](https://user-images.githubusercontent.com/1399607/229301717-71ba254b-e5c5-44f9-be70-14a46b998b42.png)
-
-![stats1](https://user-images.githubusercontent.com/1399607/230787051-743b08a1-a4f0-4d21-baec-015b44767a75.PNG)
 
 - 5-8 ms on main thread, and 140-190FPS, with 500k-1m triangles
 
-![image](https://user-images.githubusercontent.com/1399607/229584521-0f9c99b9-8741-4711-96c2-e9bd8b3b8a51.png)
+![stats1](https://user-images.githubusercontent.com/1399607/230787051-743b08a1-a4f0-4d21-baec-015b44767a75.PNG)
 
 - Diagram of the ECS layout: https://miro.com/app/board/uXjVMWg58OI=/?share_link_id=616428552594
+
+![image](https://user-images.githubusercontent.com/1399607/230787618-f4b31c5c-07e2-499c-8e7b-64f87e1818b9.png)
+
+## Project
 
 Fairly wide scope of ECS DOD / DOT usage, generic and specific setups, for a full game core loop. There are still a few gameplay details done in a hurry, marked with "// TODO:" or "// NOTE".
 
@@ -26,7 +27,7 @@ The project is set up to be visible via the Hierarchy what is going on and rough
 
 Assets\[tdbe]\Scenes\GameScene_01 <-- scene to play
 
-Play:
+### Play:
 - Control ship with the chosen input data keys in the corresponding Player prefab. By default: 
   - Player_1: arrow keys to move (physics like a hovercraft), right Ctrl to shoot, right Shift to teleport. Touch the pickups to equip them.
   - Player_2: WASD to move, Space to shoot, leftShift to teleport.
@@ -34,7 +35,7 @@ Play:
 Anything that dies disappears, no animations or GUI for now.
 
 
-Some points of interest:
+### Some points of interest:
 - everything is physics based.
 - I made what I think is a cool multithreaded RandomnessComponent using nativeArray, persistent state, and local plus per-game seeds.
 - simple but reusable Random Spawner aspect, also reused in targeted spawning of child rocks and player teleportation.
@@ -47,7 +48,7 @@ Some points of interest:
 - Quickly made a dumb but cleverly versatile offsetted outline shadergraph shader that I quickly built all my assets from "CSG style". 
 
 
-Philosophy:
+### Philosophy:
 - performant (threaded, bursted, instanced, masked) by default, not "well this won't hurt so much".
 - main system can update states of other systems, other systems control their own state and do their one job. (and there can be sub-branching).
 - a system changes the component state of something, and then another system takes over. E.g. no scripting of events chains on spawn etc.
@@ -61,7 +62,7 @@ Philosophy:
 - In ECS anything can be represented as just an efficient database query. So the limits & wisdom are about how you save, define, equip and see this query as a state in a production friendly way.
 
 
-Some annoying quirks I found:
+### Some annoying quirks I found:
 - Cross-scene communication techniques in ECS are: *\*crickets\** ..just use statics or somehtin..?
 - Oh what's that, you just wanted to quickly access some main Camera data, from your entity subscene? 🙃
 - Yo what's up with Variable Rate Update Groups - insta-updating on rate change? It's an interval, not a sometimes-interval..!
