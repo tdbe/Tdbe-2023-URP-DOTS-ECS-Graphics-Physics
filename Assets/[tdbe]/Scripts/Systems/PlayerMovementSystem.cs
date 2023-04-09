@@ -118,7 +118,9 @@ namespace GameWorld.Players
             // teleport / hyperspace
             if(input.Teleport.keyVal){
                 Unity.Mathematics.Random rg = rgc.randomGenerator;
-                ecbp.SetComponent<LocalTransform>(ciqi, ent, spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR));
+                LocalTransform newLT = spawnerAspect.GetTransform(ref rg, targetAreaBL, targetAreaTR);
+                newLT.Rotation = ltrans.Rotation;
+                ecbp.SetComponent<LocalTransform>(ciqi, ent, newLT);
                 ecbp.SetComponent<RandomnessSingleThreadedComponent>(ciqi, ent, new RandomnessSingleThreadedComponent{
                     randomGenerator = rg
                 });
