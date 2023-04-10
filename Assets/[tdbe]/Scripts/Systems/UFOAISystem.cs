@@ -92,7 +92,8 @@ namespace GameWorld.NPCs
         enum layer
         {
             // TODO: but really would be nice to actually access the Layers defined in settings.
-            WorldBounds = (1 << 9)
+            WorldBounds = (1 << 9),
+            UFOs = (1<<15)
         };
 
         [BurstCompile]
@@ -114,6 +115,7 @@ namespace GameWorld.NPCs
                 
                 if(sqDistEuclid>ufoC.minChaseDist)
                 {
+                    // alsocheck through walls
                     float sqDistPortal = float.MaxValue;
                     float3 dirToPlayer = math.normalize(playerPos - ufoLtoW.Position);
                     RaycastInput raycastInput = new RaycastInput()
@@ -122,14 +124,21 @@ namespace GameWorld.NPCs
                         End = -dirToPlayer * 100,
                         Filter = new CollisionFilter
                         {
-                            BelongsTo = (uint)layer.WorldBounds,
+                            BelongsTo = (uint)layer.UFOs,
                             CollidesWith = (uint)layer.WorldBounds,
                             GroupIndex = 0
                         }
                     };
+
+                    #if UNITY_EDITOR
+                    Debug.DrawLine(raycastInput.Start, raycastInput.End, Color.red, 0.25f);
+                    Debug.DrawLine(raycastInput.Start, dirToPlayer * 100, Color.green, 0.25f);
+                    #endif
+                    
                     if (physWorld.CastRay(raycastInput, out Unity.Physics.RaycastHit hit))
                     {
                         float3 posOnBound = hit.Position;
+                        //Debug.Log($"bounds hit={posOnBound}");
                         float sqDistToBound = math.distancesq(posOnBound, ufoLtoW.Position);
                         float sqDistBoundToPlayer = math.distancesq(-posOnBound, playerPos);
                         sqDistPortal = sqDistToBound + sqDistBoundToPlayer;

@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 7363006640433450661}
   - component: {fileID: 7800178004842418794}
   - component: {fileID: 4883105617593040060}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: visuals
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -95,7 +95,7 @@ GameObject:
   - component: {fileID: 7271440811033762022}
   - component: {fileID: 6814801395886572863}
   - component: {fileID: 4352837020038590479}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: BoundsTrigger
   m_TagString: Untagged
   m_Icon: {fileID: 0}
