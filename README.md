@@ -1,11 +1,12 @@
 # Tdbe-2023-DOTS-ECS-Graphics-Physics
+An Asteroids style game with health, powerups, ai, warp, teleportation, and local co-op.
 Quick gameplay video: https://www.deferredreality.com/images/tdbe_ecs10_quantum_asteroids_01.webm
 
 ![image](https://user-images.githubusercontent.com/1399607/229624241-bfa26a77-4a56-41a4-a14a-e5c4d359378e.png)
 
 v 2022.2.6f1
 
-## .'s 1.0 sandbox
+## DOTs ECS 1.0 sandbox
 
 - everything is unmanaged, bursted, and (multi)threaded by default (except the legacy input)
 - player, game system, states, random/spawners, variable rates, threads, aspects, dynamic buffers & nativearray components, collisions, dynamic bounds, warping, pickups with visuals, rocks, ufos+ai, shooting and health / dying.
