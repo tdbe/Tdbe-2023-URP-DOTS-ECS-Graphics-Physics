@@ -3,7 +3,7 @@ An Asteroids style game with health, powerups, ai, warp, teleportation, and loca
 
 Quick gameplay video: 
 
-![video](https://github.com/tdbe/Tdbe-2023-URP-DOTS-ECS-Graphics-Physics/assets/1399607/75d561f0-0448-4c98-8ef1-81648691fd82)
+![https://github.com/tdbe/Tdbe-2023-URP-DOTS-ECS-Graphics-Physics/assets/1399607/75d561f0-0448-4c98-8ef1-81648691fd82](https://github.com/tdbe/Tdbe-2023-URP-DOTS-ECS-Graphics-Physics/assets/1399607/75d561f0-0448-4c98-8ef1-81648691fd82)
 
 ![image](https://user-images.githubusercontent.com/1399607/229624241-bfa26a77-4a56-41a4-a14a-e5c4d359378e.png)
 
