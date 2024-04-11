@@ -3,8 +3,7 @@ An Asteroids style game with health, powerups, ai, warp, teleportation, and loca
 
 Quick gameplay video: 
 
-[https://www.deferredreality.com/images/tdbe_ecs10_quantum_asteroids_01.webm](https://www.deferredreality.com/images/tdbe_ecs10_quantum_asteroids_01_1.5x.webm)
-
+![video](https://github.com/tdbe/Tdbe-2023-URP-DOTS-ECS-Graphics-Physics/assets/1399607/75d561f0-0448-4c98-8ef1-81648691fd82)
 
 ![image](https://user-images.githubusercontent.com/1399607/229624241-bfa26a77-4a56-41a4-a14a-e5c4d359378e.png)
 
@@ -59,14 +58,14 @@ Anything that dies disappears, no animations, but there is health GUI.
 - performant (threaded, bursted, instanced, masked) by default, not "well this won't hurt so much".
 - main system can update states of other systems, other systems control their own state and do their one job. (and there can be sub-branching).
 - a system changes the component state of something, and then another system takes over. E.g. no scripting of events chains on spawn etc.
-- reuse components, systems, threads, and aspects, unless doing so becomes confusing project-management wise or future-gamedev wise.
+- reuse components, systems, threads, and aspects, unless doing so becomes confusing project-management wise or future-gamedev wise. #ProgrammerUX is real.
 - at the same time, don't split up code that you don't need accessed from anywhere else yet. E.g. you can use "{ }" to separate out blocks locally, without actually moving them out. So you don't end up with confusing modules that someone else won't know when to use, etc.
-- track memory limits, pay attention to what / when you're increasing or destroying; maybe destroy everything in one system at a controlled time.
-- think about all the limits; e.g. is it bad if you wipe out all enemies on the screen at the same time?
-- use state machines; approaches are described in code (e.g. in GameSystem).
-- maybe break up large components if there is some small part you're writing to a lot.
-- make things clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
-- In ECS anything can be represented as just an efficient database query. So the limits & wisdom are about how you save, define, equip and see this query as a state in a production friendly way.
+- track memory limits, pay attention to what / when you're increasing or destroying; queue to destroy everything only in a specialized system at controlled times.
+- think about all the limits (threads, hardware, non-ecs-ties); e.g. what happens if you wipe out all enemies on the screen at the same time?
+- use state machines, state graphs; somme approaches are described in code (e.g. in GameSystem).
+- break up large components for iteration & cache cohherency, especially there is only some small part you're writing to a lot.
+- make philosophy clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
+- In ECS anything can be represented as just an efficient database query. So the difficulty, the limits & wisdom, are about how you store, define, equip, and see this query as a state or concept, in a production-friendly sane way.
 
 
 ### Some annoying quirks I found:
