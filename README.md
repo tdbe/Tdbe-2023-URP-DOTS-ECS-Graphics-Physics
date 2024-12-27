@@ -57,26 +57,26 @@ Anything that dies disappears, no animations, but there is health GUI.
 ### Philosophy:
 - performant (threaded, bursted, instanced, masked) by default, not "well this won't hurt so much".
 - main system can update states of other systems, other systems control their own state and do their one job. (and there can be sub-branching).
-- a system changes the component state of something, and then another system takes over. E.g. no scripting of events chains on spawn etc.
+- a system changes the component state a thing, and then another system takes over. E.g. no scripting of events chains on spawn or calling systems etc.
 - reuse components, systems, threads, and aspects, unless doing so becomes confusing project-management wise or future-gamedev wise. #ProgrammerUX is real.
-- at the same time, don't split up code that you don't need accessed from anywhere else yet. E.g. you can use "{ }" to separate out blocks locally, without actually moving them out. So you don't end up with confusing modules that someone else won't know when to use, etc.
-- track memory limits, pay attention to what / when you're increasing or destroying; queue to destroy everything only in a specialized system at controlled times.
-- think about all the limits (threads, hardware, non-ecs-ties); e.g. what happens if you wipe out all enemies on the screen at the same time?
-- use state machines, state graphs; somme approaches are described in code (e.g. in GameSystem).
-- break up large components for iteration & cache cohherency, especially there is only some small part you're writing to a lot.
-- make philosophy clear at a glance: hierarchy objects, inspector notes, code descriptions of your ideas etc.
+- at the same time don't preemptively expose code that you don't need anywhere else yet. E.g. you can even use "{ }" blocks locally, in some large main function (yeah I know usually one function does one thing). Don't end up with confusing directionless fragments for someone else to hunt down and wonder when to use, etc.
+- use state machines, state graphs; some approaches are described in code (e.g. in GameSystem). Before starting a big project, create a state / decision transition visualizer that your grandma would understand.
+- break up large / often edited parts of components for iteration & cache coherency, have a look at the chunk buffers.
+- track game's memory limits. Pay attention to when anything (should be) increased / destroyed and queue them only in specialized systems at safe times.
+- track all the other bandwidths / stress points :) (threads, hardware, non-ecs-ties); e.g. what happens if you wipe out all enemies on the screen at the same time?
+- make philosophy clear at a glance: hierarchy object naming and structure, inspector notes, code descriptions of intention or the point etc.
 - In ECS anything can be represented as just an efficient database query. So the difficulty, the limits & wisdom, are about how you store, define, equip, and see this query as a state or concept, in a production-friendly sane way.
 
 
 ### Some annoying quirks I found:
-- Cross-scene communication techniques in ECS are: *\*crickets\** ..just use statics or somehtin..?
+- At this time cross-scene communication techniques in unity ECS are: *\*crickets\** ..just use statics or somehtin..?
 - Oh what's that, you just wanted to quickly access some main Camera data, from your entity subscene? 🙃
-- Yo what's up with Variable Rate Update Groups - insta-updating on rate change? It's an interval, not a sometimes-interval..!
-- Some things you don't expect, don't get authored from mono. For example: isKinematic, isTrigger, physics layers.
-- Rigidbody freeze position and rotation does NOT have a solution from Unity in ECS. Yeah there's the external JAC shit but it's not the same behaviour, it's restricting and sometimes physics-unreliable AF joint authoring components.
-- Yes you knew about the renderer and TransformSystemGroup when spawning, but ECS fixed step physics simulation will also process some collider at 0,0,0 of an entity if you don't use the right command buffer stage. And yeah I know this is per design.
+- Yo what's up with Variable Rate Update Groups insta-updating on rate change and not next tick!?
+- Some things you wouldn't expect, don't get authored from mono. For example: isKinematic, isTrigger, physics layers.
+- Rigidbody freeze position and rotation do NOT have a solution from Unity in ECS. Yeah there's the external JAC shit but it's not the same behaviour, it's restricting and sometimes physics-unreliable AF joint authoring components.
+- Yes you knew about the renderer and TransformSystemGroup when spawning, but did you know/remember the ECS Fixed Step Physics simulation will also process entity colliders at 0,0,0 if you don't use the right command buffer stage.
 - NonUniformScale/PostTransformScale component (to be replaced with PostTransformMatrix) is not disabled but actually absent by default, and can be requested / added.
-- Getting collision hit points. I get it, but cumbersome UX...
+- Getting collision hit points. I get it, but very cumbersome UX...
 
 
 ![image](https://user-images.githubusercontent.com/1399607/228077452-9fc860c3-e4eb-4a14-a27d-3230db34fdf4.png)
